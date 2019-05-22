@@ -13,7 +13,7 @@ class Robot:
         self.left_servo = Servo(13,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.right_servo = Servo(18,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.command_history = []
-        self.recognized_commands = {}
+        self.recognized_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards}
     
     def move_forward(self):
         pass
@@ -23,6 +23,10 @@ class Robot:
 
     def turn_left(self):
         pass
-        
+
     def move_backwards(self):
         pass
+    
+    def execute_commands(self,command):
+        correct_method = self.recognized_commands[command]
+        correct_method()
