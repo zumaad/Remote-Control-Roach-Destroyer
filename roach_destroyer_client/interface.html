@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class = 'jumbotron' style="text-align:center">
+            <h1> Roach Destroyer Client</h1>
+        </div>
+        <div style="text-align:center">
+            <button class ='btn btn-success' id = "connectButton"> Connect! </button>
+            <p id = "connectedText"> Currently not connected </p>
+        </div>
+
+        <p style="margin-left:100px" id = 'stateDescriptor'> State: Stationary</p>
+
+        <div>
+            <div style="margin-left:125px">
+                <img id = 'ArrowUp' src="unlitup.png">
+            </div>
+            <div>
+                <img id = 'ArrowLeft' src="unlitleft.png">
+                <img id = 'ArrowRight' src="unlitright.png">
+            </div>
+            <div style="margin-left:125px">
+                <img id = 'ArrowDown' src="unlitdown.png">
+            </div>
+        </div>
+        
+        
+        <script>
+            let socket;
+            let pressed = false
+            const litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
+            const textualCues = {'ArrowUp':'moving forward','ArrowDown':'moving backwards','ArrowLeft':'turning left','ArrowRight':'turning right'}
+            const serverAddress = "ws://192.168.1.6:8765"
+
+            document.getElementById("connectButton").addEventListener('click',() => createConnection(serverAddress))
+            document.addEventListener('keydown',(event) => sendDirection(event))
+            document.addEventListener('keyup',(event) => stop(event))
+
+
+
+            function createConnection(server) {
+                socket = new WebSocket(server)
+                socket.onopen = function (event) {
+                    document.getElementById('connectedText').innerHTML = "Succesfully connected to server at " + server; 
+                    socket.onmessage = (event) => console.log(event.data)
+                };
+            }
+
+            function sendDirection(event) { 
+                if (event.key in litKeyImageMap && !pressed) {
+                        socket.send(event.key)
+                        pressed = true
+                        document.getElementById('stateDescriptor').innerHTML = 'State: ' + textualCues[event.key]
+                        document.getElementById(event.key).src = litKeyImageMap[event.key]
+                }
+            }
+
+            function stop(event) {
+                socket.send('stop')
+                document.getElementById(event.key).src = 'un' + litKeyImageMap[event.key]
+                document.getElementById('stateDescriptor').innerHTML = 'State: Stationary'
+                pressed = false
+            }
+        </script>
+    </body>
+</html>
