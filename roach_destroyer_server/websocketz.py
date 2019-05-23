@@ -1,14 +1,22 @@
 import asyncio
 import time
 import websockets
+from robot_code import robot
+
+
+
 
     
 async def main_message_handler(websocket, path):
+
+    roach_destroyer = robot.Robot()
     while True:
         
         message = await websocket.recv()
-        print("recieved " + message + " and am passing it to consumer")
-        await websocket.send("moving " + message + ". This is running in the background")
+        print("this is the robot that was inited at " + roach_destroyer.init_at)
+        print("recieved " + message + " and am passing it to roach_destroyer")
+        roach_destroyer.execute_command(message)
+        
         
 
 
