@@ -1,7 +1,7 @@
 import asyncio
 import time
 import websockets
-from ..rc_roach_destroyer.robot_code.robot import Robot
+from robot import Robot
 
 
 
