@@ -8,7 +8,6 @@ from robot_code import robot
 
     
 async def main_message_handler(websocket, path):
-
     roach_destroyer = Robot()
     while True:
         message = await websocket.recv()
