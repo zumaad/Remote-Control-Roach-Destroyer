@@ -1,7 +1,7 @@
 
 from gpiozero import Servo
 import datetime
-from commands import Command
+from robot_code import commands
 
 #CONSTANTS
 PWM_PIN1 = 13
@@ -42,7 +42,7 @@ class Robot:
         self.right_servo.mid()
 
     def store_command_temporarily(self,command):
-        command = Command(command)
+        command = commands.Command(command)
         if self.history_on:
             self.command_history.append(command)
 
