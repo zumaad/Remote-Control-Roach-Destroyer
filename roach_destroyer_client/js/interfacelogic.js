@@ -1,7 +1,6 @@
 let socket;
 let pressed = false
 const litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
-const textualCues = {'ArrowUp':'moving forward','ArrowDown':'moving backwards','ArrowLeft':'turning left','ArrowRight':'turning right'}
 const serverAddress = "ws://192.168.1.7:8765"
 
 document.getElementById("connectButton").addEventListener('click',() => createConnection(serverAddress))
@@ -20,12 +19,17 @@ function createConnection(server) {
     };
 }
 
+function lightUpArrowDisplay(key) {
+    document.getElementById(event.key).src = 'assets/' + litKeyImageMap[key]
+
+}
+
 function sendDirection(event) { 
     if (event.key in litKeyImageMap && !pressed) {
             socket.send(event.key)
             pressed = true
-            document.getElementById('stateDescriptor').innerHTML = 'State: ' + textualCues[event.key]
-            document.getElementById(event.key).src = 'assets/' + litKeyImageMap[event.key]
+            lightUpArrowDisplay(event.key)
+            
     }
 }
 
