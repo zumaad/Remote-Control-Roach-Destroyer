@@ -26,12 +26,12 @@ class Robot:
         
 
     def turn_right(self):
-        self.right_servo.max()
-        self.left_servo.max()
+        self.right_servo.min()
+        self.left_servo.min()
 
     def turn_left(self):
-        self.left_servo.min()
-        self.right_servo.min()
+        self.left_servo.max()
+        self.right_servo.max()
 
     def move_backwards(self):
         self.left_servo.min()
