@@ -2,7 +2,7 @@ let socket;
 let pressed = false
 const litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
 const textualCues = {'ArrowUp':'moving forward','ArrowDown':'moving backwards','ArrowLeft':'turning left','ArrowRight':'turning right'}
-const serverAddress = "ws://192.168.1.6:8765"
+const serverAddress = "ws://192.168.1.7:8765"
 
 document.getElementById("connectButton").addEventListener('click',() => createConnection(serverAddress))
 document.addEventListener('keydown',(event) => sendDirection(event))
