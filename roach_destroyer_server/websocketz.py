@@ -8,7 +8,7 @@ from robot_code import robot
 
     
 async def main_message_handler(websocket, path):
-    roach_destroyer = Robot()
+    roach_destroyer = robot.Robot()
     while True:
         message = await websocket.recv()
         print("this is the robot that was inited at " + str(roach_destroyer.init_at))
