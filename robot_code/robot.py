@@ -49,12 +49,6 @@ class Robot:
     def flush_temporary_history(self):
         self.command_history = []
     
-    def store_history_permanently(self):
-        with open(self.command_database_url,"a") as database:
-            for command in self.command_history:
-                database.write(command.__repr__() + '\n')
-            database.write("END--------------------------------")
-
     def execute_command(self,command):
         self.store_command_temporarily(command)
         correct_method = self.recognized_commands[command]

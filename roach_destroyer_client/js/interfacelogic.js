@@ -15,9 +15,16 @@ function createConnection(server) {
     socket = new WebSocket(server)
     socket.onopen = function (event) {
         document.getElementById('connectedText').innerHTML = "Succesfully connected to server at " + server; 
-        socket.onmessage = (event) => console.log(event.data)
+        socket.onmessage = (event) => handleServerMessages(event.data)
     };
 }
+
+function handleServerMessages(data) {
+    console.log(data)
+
+}
+
+
 
 function lightUpArrowDisplay(key) {
     document.getElementById(event.key).src = 'assets/' + litKeyImageMap[key]
