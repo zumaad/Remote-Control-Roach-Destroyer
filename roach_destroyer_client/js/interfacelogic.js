@@ -1,7 +1,7 @@
 let socket;
 let pressed = false
 const litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
-const serverAddress = "ws://192.168.1.7:8765"
+const serverAddress = "ws://192.168.1.6:8765"
 
 document.getElementById("connectButton").addEventListener('click',() => createConnection(serverAddress))
 document.addEventListener('keydown',(event) => sendDirection(event))
@@ -43,11 +43,10 @@ function sendDirection(event) {
 function stop(event) {
     socket.send('stop')
     document.getElementById(event.key).src = 'assets/' + 'un' + litKeyImageMap[event.key]
-    document.getElementById('stateDescriptor').innerHTML = 'State: Stationary'
     pressed = false
 }
 
-function displaySpeed() {
+function displaySpeed() {s
     let speedText = document.getElementById("speedText")
     speedText.innerHTML = event.target.value + '%'
 }
