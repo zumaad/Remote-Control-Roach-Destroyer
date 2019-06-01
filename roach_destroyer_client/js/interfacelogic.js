@@ -46,7 +46,7 @@ function stop(event) {
     pressed = false
 }
 
-function displaySpeed() {s
+function displaySpeed(event) {
     let speedText = document.getElementById("speedText")
     speedText.innerHTML = event.target.value + '%'
 }
