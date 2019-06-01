@@ -20,7 +20,7 @@ function createConnection(server) {
 }
 
 function handleServerMessages(data) {
-    console.log(data)
+    document.getElementById('stream').src = "data:image/;base64," + data
 
 }
 
