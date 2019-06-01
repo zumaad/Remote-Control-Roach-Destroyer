@@ -40,7 +40,8 @@ class ClientInterface {
         document.getElementById(event.key).src = 'assets/' + this.litKeyImageMap[key]
     }
 
-    sendDirection(event) { 
+    sendDirection(event) {
+        event.preventDefault()
         if (event.key in this.litKeyImageMap && !this.pressed) {
                 socket.send(event.key)
                 this.pressed = true
@@ -49,6 +50,7 @@ class ClientInterface {
     }
 
     stop(event) {
+        event.preventDefault()
         socket.send('stop')
         document.getElementById(event.key).src = 'assets/' + 'un' + this.litKeyImageMap[event.key]
         this.pressed = false
