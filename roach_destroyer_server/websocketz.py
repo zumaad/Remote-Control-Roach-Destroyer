@@ -10,7 +10,7 @@ import base64
 
 async def start_streaming(websocket):
     camera = PiCamera()
-    camera.resolution = (400, 300)
+    camera.resolution = (700, 400)
     time.sleep(2)
     while True:
         my_stream = BytesIO()
