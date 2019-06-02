@@ -1,52 +1,99 @@
-let socket;
-let pressed = false
-const litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
-const serverAddress = "ws://192.168.1.6:8765"
 
-document.getElementById("connectButton").addEventListener('click',() => createConnection(serverAddress))
-document.addEventListener('keydown',(event) => sendDirection(event))
-document.addEventListener('keyup',(event) => stop(event))
-document.getElementById("speedRange").addEventListener('input',(event) => displaySpeed(event))
+class ClientInterface {
+    constructor() {
+        this.socket = null
+        this.pressed = false
+        this.streamBoxReady = false
+        this.litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
+        this.serverAddress = "ws://192.168.1.6:8765"
+        this.addAllEventListeners()
+    }
 
+    addAllEventListeners() {
+        document.addEventListener('keydown',(event) => this.sendDirection(event))
+        document.addEventListener('keyup',(event) => this.stop(event))
+        document.getElementById("connectButton").addEventListener('click',() => this.createConnection(this.serverAddress))
+        document.getElementById("speedRange").addEventListener('input',(event) => this.displaySpeed(event))
+        document.getElementById('startStream').addEventListener('click',()=> this.startStreamButton())
+    }
 
+    createConnection(server) {
+        this.socket = new WebSocket(server)
+        this.socket.onopen = function (event) {
+            document.getElementById('connectedText').innerHTML = "Succesfully connected to server at " + server; 
+            socket.onmessage = (event) => this.handleServerMessages(event.data)
+        };
+    }
 
+    handleServerMessages(data) {
+        if (!this.streamBoxReady) {
+            this.clearStreamBox()
+            this.streamBoxReady = true;
+            document.getElementById('stream').src = "data:image/jpeg;base64," + data
+        }
+        else {
+            document.getElementById('stream').src = "data:image/jpeg;base64," + data
+    }
+    }
 
-function createConnection(server) {
-    socket = new WebSocket(server)
-    socket.onopen = function (event) {
-        document.getElementById('connectedText').innerHTML = "Succesfully connected to server at " + server; 
-        socket.onmessage = (event) => handleServerMessages(event.data)
-    };
-}
+    lightUpArrowDisplay(key) {
+        document.getElementById(event.key).src = 'assets/' + this.litKeyImageMap[key]
+    }
 
-function handleServerMessages(data) {
-    console.log(data)
+    sendDirection(event) {
+        event.preventDefault()
+        if (event.key in this.litKeyImageMap && !this.pressed) {
+                socket.send(event.key)
+                this.pressed = true
+                this.lightUpArrowDisplay(event.key)      
+        }
+    }
 
-}
+    stop(event) {
+        event.preventDefault()
+        socket.send('stop')
+        document.getElementById(event.key).src = 'assets/' + 'un' + this.litKeyImageMap[event.key]
+        this.pressed = false
+    }
 
+    displaySpeed(event) {
+        let speedText = document.getElementById("speedText")
+        speedText.innerHTML = event.target.value + '%'
+    }
 
+    startStreamButton() {
+        this.socket.send("start stream")
+        this.prepareStreamBox()
+    }
 
-function lightUpArrowDisplay(key) {
-    document.getElementById(event.key).src = 'assets/' + litKeyImageMap[key]
+    prepareStreamBox() {
+        let streamBox = document.getElementById('streambox');
+        streamBox.removeChild(document.getElementById('startStream'))
+        let placeholderText = document.createElement('p')
+        placeholderText.id = "placeholderText"
+        placeholderText.innerHTML = "Waiting for Camera to warm up..."
+        streamBox.appendChild(placeholderText)
+    }
 
-}
-
-function sendDirection(event) { 
-    if (event.key in litKeyImageMap && !pressed) {
-            socket.send(event.key)
-            pressed = true
-            lightUpArrowDisplay(event.key)
-            
+    clearStreamBox() {
+        let placeholderText = document.getElementById('placeholderText')
+        placeholderText.parentNode.removeChild(placeholderText)
     }
 }
 
-function stop(event) {
-    socket.send('stop')
-    document.getElementById(event.key).src = 'assets/' + 'un' + litKeyImageMap[event.key]
-    pressed = false
-}
+new ClientInterface()
 
-function displaySpeed() {s
-    let speedText = document.getElementById("speedText")
-    speedText.innerHTML = event.target.value + '%'
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -18,8 +18,10 @@
         </div>
 
         
-        <div id = "controlsPane">
-            <div id = "innerControlsPane">
+
+        
+        <div id = "controlsAndVideoPane">
+            <div id = "controlsPane">
                     <p> <h3> Controls Pane</h3></p>
                 
                     <div id = "speedSlider">
@@ -44,22 +46,29 @@
                         </div>
                     </div>
                 </div>
+                <div id ="streambox">
+                    <img id = "stream" src = "">
+                    <button id = "startStream" class="btn btn-success"> Start Stream!</button>
+                </div>
         </div>
         <div id = "footer"></div>
         </div>
         
 
         <style>
-            #controlsPane {
+            #controlsAndVideoPane{
                 border: 3px solid #3500D3;
                 border-radius: 5%;
                 margin-left: 2%;
-                width: 30%;
-                color: aliceblue
+                margin-right: 2%;
+                color: aliceblue;
+                display: flex;
             }
-            #innerControlsPane {
-                margin-left: 3%;
+            #controlsPane {
                 text-align: center;
+                width: 400px;
+                border: 3px solid #3500D3;
+                border-radius: 5%;
             }
 
             #arrowsPane {
@@ -87,6 +96,16 @@
                 text-align: center;
                 margin-bottom: 5%;
                 padding-top: 5%;
+            }
+
+            #streambox {
+                border: #3500D3 3px solid;
+                flex-grow: 1;
+                border-radius: 5%;
+                width: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         </style>
         
