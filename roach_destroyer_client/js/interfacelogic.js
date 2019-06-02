@@ -3,10 +3,12 @@
 class ClientInterface {
     constructor() {
         this.socket = null
+        this.streamingSocket = null
         this.pressed = false
         this.streamBoxReady = false
         this.litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
         this.serverAddress = "ws://192.168.1.6:8765"
+        this.streamingAddress = "ws://192.168.1.6:8764"
         this.addAllEventListeners()
     }
 
@@ -21,8 +23,11 @@ class ClientInterface {
     createConnection(server) {
         this.socket = new WebSocket(server)
         this.socket.onopen = (event) => document.getElementById('connectedText').innerHTML = "Succesfully connected to server at " + server
-        
         this.socket.onmessage = (event) => this.handleServerMessages(event.data)
+
+        this.streamingSocket = new WebSocket(this.streamingAddress)
+        this.streamingSocket.onmessage = (event) => this.handleServerMessages(event.data)
+
     }
 
     handleServerMessages(data) {
@@ -62,7 +67,7 @@ class ClientInterface {
     // }
 
     startStreamButton() {
-        this.socket.send("start stream")
+        this.streamingSocket.send("start stream")
         this.prepareStreamBox()
     }
 
