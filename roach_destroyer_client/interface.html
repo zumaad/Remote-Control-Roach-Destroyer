@@ -13,7 +13,7 @@
         
 
         <div id = "connectionPane">
-            <button class ='btn blueButtons' id = "connectButton"> Connect! </button>
+            <button class ='btn btn-success' id = "connectButton"> Connect! </button>
             <p id = "connectedText"> Currently not connected </p>
         </div>
 
@@ -24,14 +24,14 @@
             <div id = "controlsPane">
                     <p> <h3> Controls Pane</h3></p>
                 
-                    <div id = "speedSlider">
+                    <!-- <div id = "speedSlider">
                         <p style="display: inline-block"> Speed Slider</p>
                         <input id = "speedRange" type="range" max="100" min="0" value="50">
                         <p id = "speedText"></p>
                         <div>
                             <button class="btn blueButtons"> Apply </button>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div id = "arrowsPane">
                         <div>
@@ -46,9 +46,12 @@
                         </div>
                     </div>
                 </div>
-                <div id ="streambox">
-                    <img id = "stream" src = "">
-                    <button id = "startStream" class="btn btn-success"> Start Stream!</button>
+
+                <div id ="streamContainer">
+                    <div id = "streamBox">
+                        <button id = "startStream" class="btn btn-success"> Start Stream!</button>
+                    </div>
+                    
                 </div>
         </div>
         <div id = "footer"></div>
@@ -63,6 +66,7 @@
                 margin-right: 2%;
                 color: aliceblue;
                 display: flex;
+
             }
             #controlsPane {
                 text-align: center;
@@ -98,14 +102,19 @@
                 padding-top: 5%;
             }
 
-            #streambox {
-                border: #3500D3 3px solid;
+            #streamContainer {
+                display: flex;
                 flex-grow: 1;
-                border-radius: 5%;
-                width: 100px;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #streamBox {
+                border: 3px solid #3500D3;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                border-radius: 5%
             }
         </style>
         
