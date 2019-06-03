@@ -2,9 +2,13 @@
 
 ### A remote control robot controlled with a raspberrypi.
 
-### Current progress
 
+
+### Current progress
 I can control the robot remotely and have it stream back the camera feed to the client (browser)!
+
+#### Client interface pic
+![alt text](https://github.com/zumaad/Remote-Control-Roach-Destroyer/blob/master/clientInterface.png)
 
 ### Goals: 
 - Be able to control the robot remotely (move it around) through a web interface using the websockets protocol. DONE!
