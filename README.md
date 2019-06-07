@@ -6,7 +6,10 @@
 
 ### Current progress
 I can control the robot remotely and have it stream back the camera feed to the client (browser)!
-^ will have a video of it in action up soon
+
+https://youtu.be/YflDiKFGsfs 
+
+skip to :21 for some streaming action. The video isn't too good (recorded vertically) and could be filmed from a better angle, so I'll update that soon.
 
 #### Client interface pic
 ![alt text](https://github.com/zumaad/Remote-Control-Roach-Destroyer/blob/master/clientInterface.png)

@@ -7,30 +7,36 @@ class ClientInterface {
         this.pressed = false
         this.streamBoxReady = false
         this.litKeyImageMap = {'ArrowUp':'litup.png','ArrowDown':'litdown.png','ArrowLeft':'litleft.png','ArrowRight':'litright.png'}
-        this.serverAddress = "ws://192.168.1.6:8765"
-        this.streamingAddress = "ws://192.168.1.6:8764"
-        this.addAllEventListeners()
+        this.serverAddress = "ws://192.168.1.3:8765"
+        this.streamingAddress = "ws://192.168.1.3:8764"
+        this.historyOn = false;
+
+        this.addAllEventListeners() 
     }
 
     addAllEventListeners() {
         document.addEventListener('keydown',(event) => this.sendDirection(event))
         document.addEventListener('keyup',(event) => this.stop(event))
         document.getElementById("connectButton").addEventListener('click',() => this.createConnection(this.serverAddress))
-        // document.getElementById("speedRange").addEventListener('input',(event) => this.displaySpeed(event))
+        document.getElementById('historyButton').addEventListener('click',() => this.toggleHistory())
         document.getElementById('startStream').addEventListener('click',()=> this.startStreamButton())
     }
 
     createConnection(server) {
         this.socket = new WebSocket(server)
         this.socket.onopen = (event) => document.getElementById('connectedText').innerHTML = "Succesfully connected to server at " + server
-        this.socket.onmessage = (event) => this.handleServerMessages(event.data)
+        this.socket.onmessage = (event) => this.handleRobotMessages(event.data)
 
         this.streamingSocket = new WebSocket(this.streamingAddress)
-        this.streamingSocket.onmessage = (event) => this.handleServerMessages(event.data)
+        this.streamingSocket.onmessage = (event) => this.handleStreamMessages(event.data)
 
     }
 
-    handleServerMessages(data) {
+    handleRobotMessages(data) {
+        console.log(data)
+    }
+
+    handleStreamMessages(data) {
         if (!this.streamBoxReady) {
             this.streamBoxReady = true;
             this.clearStreamBox()
@@ -48,23 +54,20 @@ class ClientInterface {
     sendDirection(event) {
         event.preventDefault()
         if (event.key in this.litKeyImageMap && !this.pressed) {
+
                 this.socket.send(event.key)
                 this.pressed = true
                 this.lightUpArrowDisplay(event.key)      
         }
     }
-
+    
     stop(event) {
+        console.log("stop")
         event.preventDefault()
         this.socket.send('stop')
         document.getElementById(event.key).src = 'assets/' + 'un' + this.litKeyImageMap[event.key]
         this.pressed = false
     }
-
-    // displaySpeed(event) {
-    //     let speedText = document.getElementById("speedText")
-    //     speedText.innerHTML = event.target.value + '%'
-    // }
 
     startStreamButton() {
         this.streamingSocket.send("start stream")
@@ -89,6 +92,20 @@ class ClientInterface {
     clearStreamBox() {
         let placeholderText = document.getElementById('placeholderText')
         placeholderText.parentNode.removeChild(placeholderText)
+    }
+
+    toggleHistory() {
+        let historyButton = document.getElementById('historyButton')
+        if (!this.historyOn) {
+            this.historyOn = true
+            historyButton.innerHTML = "turn history off"
+            historyButton.className = 'btn nightowlErrorButton'
+        }
+        else {
+            this.historyOn = false
+            historyButton.innerHTML = "turn history on"
+            historyButton.className = 'btn nightowlButtons'
+        }
     }
 }
 

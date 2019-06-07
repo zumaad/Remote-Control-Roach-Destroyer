@@ -1,0 +1,94 @@
+#controlsAndVideoPane{
+    border: 3px solid #7fdbca;
+    border-radius: 5%;
+    margin-left: 2%;
+    margin-right: 2%;
+    color: #82AAFF;
+    display: flex;
+
+}
+#controlsPane {
+    text-align: center;
+    width: 400px;
+    border: 3px solid #7fdbca;
+    border-radius: 5%;
+}
+
+#arrowsPane {
+    margin-top: 3%;
+}
+
+#connectionPane {
+    text-align: center;
+}
+
+#mainPage {
+    background: #000C1D;
+    color: #82AAFF
+}
+
+.blueButtons {
+    background: #3500D3;
+}
+
+#footer {
+    height: 10%;
+}
+
+#header {
+    text-align: center;
+    margin-bottom: 5%;
+    padding-top: 5%;
+}
+
+#streamContainer {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+#streamBox {
+    border: 3px solid #7fdbca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5%
+}
+
+#historyPane {
+    border: 3px solid #7fdbca;
+    border-radius: 5%;
+    margin: 2%;
+    width:32%;
+    text-align: center;
+    height: 130px;
+}
+
+#buttonsPane {
+    padding:10px;
+}
+
+.nightowlButtons {
+    background: #7fdbca
+}
+
+.nightowlErrorButton {
+    background: #ff5874
+}
+
+.nightowlPurpleButton {
+    background:#c792ea
+}
+
+#historyAndCommandPane {
+    display: flex;
+    justify-content: center;
+}
+
+#commandsPane {
+    border: 3px solid #7fdbca;
+    border-radius: 5%;
+    text-align: center;
+}
+

@@ -1,0 +1,136 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#controlsAndVideoPane{
+  border: 3px solid #7fdbca;
+  border-radius: 5%;
+  margin-left: 2%;
+  margin-right: 2%;
+  color: #82AAFF;
+  display: flex;
+
+}
+#controlsPane {
+  text-align: center;
+  width: 400px;
+  border: 3px solid #7fdbca;
+  border-radius: 5%;
+}
+
+#arrowsPane {
+  margin-top: 3%;
+}
+
+#connectionPane {
+  text-align: center;
+}
+
+#mainPage {
+  background: #000C1D;
+  color: #82AAFF;
+}
+
+.blueButtons {
+  background: #3500D3;
+}
+
+#footer {
+  height: 50%;
+}
+
+#header {
+  text-align: center;
+  margin-bottom: 5%;
+  padding-top: 5%;
+}
+
+#streamContainer {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+#streamBox {
+  border: 3px solid #7fdbca;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5%
+}
+
+#historyPane {
+  border: 3px solid #7fdbca;
+  border-radius: 5%;
+  margin: 2%;
+  width:32%;
+  text-align: center;
+  height: 130px;
+}
+
+#buttonsPane {
+  padding:10px;
+}
+
+.nightowlButtons {
+  background: #7fdbca
+}
+
+.nightowlErrorButton {
+  background: #ff5874
+}
+
+.nightowlPurpleButton {
+  background:#c792ea
+}
+
+#historyPaneContainer {
+  display: flex;
+  justify-content: center;
+}
+
+#commandsPaneContainer {
+  display: flex;
+  justify-content: center;
+}
+
+#commandsPane {
+  border: 3px solid #7fdbca;
+  border-radius: 5%;
+  text-align: center;
+  width: 32%;
+  margin-bottom: 3%;
+  
+}
+
