@@ -23,6 +23,11 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-/roach_destroyer_client2/node_modules
-/Users/zumaad/rc_roach_destroyer/roach_destroyer_client2/src/serviceWorker.js
-/Users/zumaad/rc_roach_destroyer/roach_destroyer_client2/src/logo.svg
+/roach_destroyer_client_react/node_modules
+/roach_destroyer_client_react/src/serviceWorker.js
+/roach_destroyer_client_react/src/logo.svg
+/roach_destroyer_client_react/public/favicon.ico
+/roach_destroyer_client_react/public/manifest.json
+/roach_destroyer_client_react/src/App.test.js
+/roach_destroyer_client_react/src/index.css
+
