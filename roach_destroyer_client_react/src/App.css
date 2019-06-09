@@ -56,6 +56,10 @@
   text-align: center;
 }
 
+body {
+  background: #000C1D;
+}
+
 #mainPage {
   background: #000C1D;
   color: #82AAFF;
@@ -90,7 +94,7 @@
   border-radius: 5%
 }
 
-#historyPane {
+#historyControlsPanel {
   border: 3px solid #7fdbca;
   border-radius: 5%;
   margin: 2%;
@@ -115,22 +119,44 @@
   background:#c792ea
 }
 
-#historyPaneContainer {
+.nightowlGreenButton {
+  background:#addb67
+}
+
+#historyControlsContainer {
   display: flex;
   justify-content: center;
 }
 
-#commandsPaneContainer {
+/* #commandsPaneContainer {
   display: flex;
   justify-content: center;
-}
+} */
 
 #commandsPane {
-  border: 3px solid #7fdbca;
   border-radius: 5%;
   text-align: center;
-  width: 32%;
   margin-bottom: 3%;
-  
+  color:#c792ea;
 }
 
+#commandSetContainer {
+  border: 3px solid #7fdbca;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.commandSet {
+  display: inline-block;
+  margin: 10px;
+  border: 3px solid #7fdbca;
+  height:200px;
+  width: 200px;
+  text-align: center;
+}
+
+.setName {}
+
+#commandSetLabelDiv {
+  text-align: center;
+}
