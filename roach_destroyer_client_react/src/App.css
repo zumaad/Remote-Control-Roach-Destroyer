@@ -155,8 +155,24 @@ body {
   text-align: center;
 }
 
-.setName {}
+#specificSet {
+  text-align: center;
+  height: 230px;
+  overflow: auto;
+}
 
 #commandSetLabelDiv {
   text-align: center;
+  width: 50%;
+  margin: 2%;
+}
+
+#historyContainer {
+  display: flex;
+}
+
+#specificSetContainer {
+  text-align: center;
+  margin: 2%;
+  flex-grow: 1;
 }

@@ -82,7 +82,7 @@ class HistoryPanel extends React.Component {
     super(props);
     this.state = { 
       commandSets: 
-      {"name1":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
+      {"name1":[],
       "name2":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
       "name3":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
       "name4":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
@@ -105,12 +105,13 @@ class HistoryPanel extends React.Component {
       
       this.pushSelected = this.pushSelected.bind(this);
       this.createCommandSets = this.createCommandSets.bind(this);
+      this.gatherPairsOfCommands = this.gatherPairsOfCommands.bind(this);
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps) {
     if (this.state.currentSet) {
       let recievedCommand,recievedTime;
-      [recievedCommand,recievedTime] = this.props.commandAndTime
+      [recievedCommand,recievedTime] = nextProps.commandAndTime
       if (recievedTime != this.state.lastTime) {
         let copiedCommandSet = JSON.parse(JSON.stringify(this.state.commandSets))
         copiedCommandSet[this.state.currentSet].push({command:recievedCommand,time:recievedTime})
@@ -123,12 +124,29 @@ class HistoryPanel extends React.Component {
     this.setState({currentSet:setName})
   }
 
-  createCommandSets() {
+  createCommandSets(commandSets) {
     let elementArray = []
-    for (let name in this.state.commandSets){
-      elementArray.push(<CommandSet pushSelectedFunc = {this.pushSelected} setName = {name} commands = {this.state.commandSets[name]}/>)
+    for (let name in commandSets){
+      elementArray.push(<CommandSet pushSelectedFunc = {this.pushSelected} setName = {name}/>)
     }
     return elementArray
+  }
+
+  gatherPairsOfCommands(commandArr) {
+    let elementArr = []
+    let length = commandArr.length;
+    for (let i= 0;i< length;i+=2) {
+      if (!(i+1 >= length)) {
+        elementArr.push(
+        <p> 
+          {commandArr[i].command} {commandArr[i].time} | {commandArr[i+1].command} {commandArr[i+1].time} | duration: {commandArr[i+1].time - commandArr[i].time}
+        </p>)
+      }
+      else {
+        elementArr.push(<p> {commandArr[i].command} {commandArr[i].time} </p>)
+      }
+    }
+    return elementArr
   }
 
 
@@ -137,11 +155,36 @@ class HistoryPanel extends React.Component {
     return (
       <div>
         <HistoryControlsContainer/>
-        <CommandSetContainer createCommandSetsFunc = {this.createCommandSets}/>
-        {this.state.currentSet && <ViewSelectedCommandSet setName = {this.state.currentSet} commandSets = {this.state.commandSets }/>}
+        <CommandsHistoryContainer 
+        createCommandSetsFunc = {this.createCommandSets} 
+        commandSets = {this.state.commandSets} 
+        setName = {this.state.currentSet} 
+        gatherPairsOfCommands = {this.gatherPairsOfCommands}
+        setName = {this.state.currentSet}/>
       </div>
     )
   }
+}
+
+function CommandsHistoryContainer(props) {
+  let specificSet = props.setName? 
+  <ViewSelectedCommandSet setName = {props.setName} commandSets = {props.commandSets} gatherPairsOfCommands = {props.gatherPairsOfCommands}/>
+  :
+  <div style = {{textAlign:'center',margin:'2%',flexGrow:'1'}}>
+    <i> <h4>You are not currently viewing any set</h4> </i>
+  </div>
+  
+
+  return (
+    
+    <div id = "historyContainer">
+      <CommandSetContainer 
+      createCommandSetsFunc = {props.createCommandSetsFunc} 
+      commandSets = {props.commandSets}
+      />
+      {specificSet}
+    </div>
+  )
 }
 
 function CommandSetContainer(props){
@@ -149,7 +192,7 @@ function CommandSetContainer(props){
     <div id = "commandSetLabelDiv">
       <h4> <i> Command Sets</i></h4>
       <div id = "commandSetContainer">
-        {props.createCommandSetsFunc()}
+        {props.createCommandSetsFunc(props.commandSets)}
       </div>
     </div>
   )
@@ -193,20 +236,18 @@ function CommandSet(props) {
 
 function ViewSelectedCommandSet(props) {
   return (
-    <div id = "specificSet">
-      <p> {props.setName}</p>
-      {props.commandSets[props.setName].map((command) => <p> {command.command} {command.time} </p>)}
+    <div id = "specificSetContainer">
+      <h4> <i> Currently Viewing Set: {props.setName}</i></h4>
+      <div id = "specificSet">
+        {props.gatherPairsOfCommands(props.commandSets[props.setName])}
+      </div>
     </div>
+    
   )
-
 }
+
+
   
-
-
-
-
-
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -242,7 +283,9 @@ class App extends React.Component {
     event.preventDefault();
     if (!this.state.arrowPressed & event.key in this.state.arrows) {
       // this.state.commandServer.send(event.key)
-      this.setState({ arrowPressed: true ,commandAndTime:[event.key,new Date().getTime()]})
+      let keyAndTime = [event.key,new Date().getTime()]
+      console.log(keyAndTime)
+      this.setState({ arrowPressed: true ,commandAndTime:keyAndTime})
       this.changeArrowDisplay(event.key, 'on')
 
 
@@ -252,7 +295,7 @@ class App extends React.Component {
   stopMoving(event) {
     if (event.key in this.state.arrows) {
       // this.state.commandServer.send("stop")
-      this.setState({ arrowPressed: false })
+      this.setState({ arrowPressed: false,commandAndTime:["stop",new Date().getTime()]})
       this.changeArrowDisplay(event.key, 'off')
     }
   }
@@ -273,6 +316,7 @@ class App extends React.Component {
   }
 
   render() {
+    console.log("in render",this.state.commandAndTime)
     return (
       <div id="mainPage" onKeyDown={this.sendDirection} tabIndex="0" onKeyUp={this.stopMoving}>
 
