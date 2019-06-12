@@ -98,9 +98,9 @@ body {
   border: 3px solid #7fdbca;
   border-radius: 5%;
   margin: 2%;
-  width:32%;
+  width:25%;
   text-align: center;
-  height: 130px;
+  /* height: 130px; */
 }
 
 #buttonsPane {
@@ -123,6 +123,15 @@ body {
   background:#addb67
 }
 
+.nightowlOrangeButton {
+  background:#F78C6C
+}
+
+.nightowlBlueButton {
+  background: #82AAFF;
+}
+
+
 #historyControlsContainer {
   display: flex;
   justify-content: center;
@@ -144,6 +153,8 @@ body {
   border: 3px solid #7fdbca;
   overflow: auto;
   white-space: nowrap;
+  border-radius: 5%;
+  height: 230px;
 }
 
 .commandSet {
@@ -153,12 +164,14 @@ body {
   height:200px;
   width: 200px;
   text-align: center;
+  border-radius: 5%;
 }
 
 #specificSet {
   text-align: center;
   height: 230px;
   overflow: auto;
+  color:#c792ea;
 }
 
 #commandSetLabelDiv {
@@ -175,4 +188,17 @@ body {
   text-align: center;
   margin: 2%;
   flex-grow: 1;
+}
+
+
+.spacedBtn {
+  margin: 10px;
+}
+
+.notConnectedText {
+  color:#ff5874
+}
+
+.connectedText {
+  color: #addb67
 }

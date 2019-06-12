@@ -40,12 +40,13 @@ function Header(props) {
 }
 
 function ConnectionPanel(props) {
-  let commandServerText = props.commandServerConnected ? "command server connected" : "command server not connected"
-  let streamServerText = props.streamServerConnected ? "streaming server connected" : "streaming server not connected"
+  let commandServerText = props.commandServerConnected ? <p className = "connectedText">command server connected</p> : <p className = "notConnectedText">command server not connected</p>
+  let streamServerText = props.streamServerConnected ?  <p className = "connectedText">streaming server connected</p> : <p className = "notConnectedText">streaming server not connected</p>
   return (
     <div id="connectionPane">
       <button onClick={props.createConnection} className='btn nightowlButtons' id="connectButton"> Connect! </button>
-      <p id="connectedText"> {commandServerText + ' and ' + streamServerText}</p>
+      {commandServerText}
+      {streamServerText}
     </div>
   )
 }
@@ -64,7 +65,7 @@ class StreamPanel extends React.Component {
   }
 
   render() {
-    let button = this.state.buttonPressed ? "" : <button id="startStream" className="btn nightowlButtons" onClick={this.prepareStreamBox}> Start Stream!</button>
+    let button = this.state.buttonPressed ? null : <button id="startStream" className="btn nightowlButtons" onClick={this.prepareStreamBox}> Start Stream!</button>
     let streamImage = this.state.buttonPressed ? <img id='stream' style={{ padding: '10px' }} /> : ""
     return (
       <div id="streamContainer">
@@ -87,25 +88,17 @@ class HistoryPanel extends React.Component {
       "name3":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
       "name4":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
       "name5":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name6":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name7":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name8":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name9":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name10":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name11":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name12":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name13":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name14":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name15":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name16":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name17":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name18":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
+      "name6":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
       currentSet:null,
       lastTime:null}
       
       this.pushSelected = this.pushSelected.bind(this);
       this.createCommandSets = this.createCommandSets.bind(this);
       this.gatherPairsOfCommands = this.gatherPairsOfCommands.bind(this);
+      this.pushNewSet = this.pushNewSet.bind(this);
+      this.deleteSet = this.deleteSet.bind(this);
+      this.flushSet = this.flushSet.bind(this);
+      this.playSet = this.playSet.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -119,15 +112,37 @@ class HistoryPanel extends React.Component {
       }
       }
     }
+
+  playSet() {
+    if (this.state.currentSet && this.props.commandServerSocket.readyState === 1){
+      this.props.commandServerSocket.send(JSON.stringify(this.state.commandSets[this.state.currentSet]))
+    }
+  }
+
+  deleteSet() {
+    if (this.state.currentSet) {
+      let copiedCommandSet = JSON.parse(JSON.stringify(this.state.commandSets))
+      delete copiedCommandSet[this.state.currentSet]
+      this.setState({commandSets:copiedCommandSet,currentSet:null})
+    }
+  }
+
+  flushSet() {
+    if (this.state.currentSet) {
+      let copiedCommandSet = JSON.parse(JSON.stringify(this.state.commandSets))
+      copiedCommandSet[this.state.currentSet] = []
+      this.setState({commandSets:copiedCommandSet})
+    }
+  }
   
   pushSelected(setName) {
-    this.setState({currentSet:setName})
+    this.state.currentSet? this.setState({currentSet:null}) : this.setState({currentSet:setName})
   }
 
   createCommandSets(commandSets) {
     let elementArray = []
     for (let name in commandSets){
-      elementArray.push(<CommandSet pushSelectedFunc = {this.pushSelected} setName = {name}/>)
+      elementArray.push(<CommandSet currentSet = {this.state.currentSet} pushSelectedFunc = {this.pushSelected} setName = {name}/>)
     }
     return elementArray
   }
@@ -139,7 +154,7 @@ class HistoryPanel extends React.Component {
       if (!(i+1 >= length)) {
         elementArr.push(
         <p> 
-          {commandArr[i].command} {commandArr[i].time} | {commandArr[i+1].command} {commandArr[i+1].time} | duration: {commandArr[i+1].time - commandArr[i].time}
+          {commandArr[i].command} {commandArr[i].time} | {commandArr[i+1].command} {commandArr[i+1].time} | duration: {commandArr[i+1].time - commandArr[i].time} ms
         </p>)
       }
       else {
@@ -149,12 +164,22 @@ class HistoryPanel extends React.Component {
     return elementArr
   }
 
+  pushNewSet(setName) {
+    let copiedCommandSet = JSON.parse(JSON.stringify(this.state.commandSets))
+    copiedCommandSet[setName] = []
+    this.setState({commandSets:copiedCommandSet})
 
+  }
 
   render() {
     return (
       <div>
-        <HistoryControlsContainer/>
+        <HistoryControlsContainer 
+        pushNewSet = {this.pushNewSet}
+        deleteSet = {this.deleteSet}
+        flushSet = {this.flushSet}
+        playSet = {this.playSet}/>
+
         <CommandsHistoryContainer 
         createCommandSetsFunc = {this.createCommandSets} 
         commandSets = {this.state.commandSets} 
@@ -173,14 +198,12 @@ function CommandsHistoryContainer(props) {
   <div style = {{textAlign:'center',margin:'2%',flexGrow:'1'}}>
     <i> <h4>You are not currently viewing any set</h4> </i>
   </div>
-  
-
   return (
-    
     <div id = "historyContainer">
       <CommandSetContainer 
       createCommandSetsFunc = {props.createCommandSetsFunc} 
       commandSets = {props.commandSets}
+      pushNewSet = {props.pushNewSet}
       />
       {specificSet}
     </div>
@@ -204,9 +227,12 @@ function HistoryControlsContainer(props){
       <div id="historyControlsPanel">
         <h3> History Controls </h3>
         <div id="buttonsPane">
-          <button id="historyButton" className="btn nightowlButtons"> Turn history on</button>
-          <button className="btn nightowlErrorButton"> Flush current set</button>
-          <button className="btn nightowlPurpleButton"> New set</button>
+          <button onClick = {props.playSet} className = 'btn nightowlGreenButton spacedBtn'> Play</button>
+          <button className = 'btn nightowlPurpleButton spacedBtn'> Reverse </button>
+          <button onClick = {props.deleteSet} className = 'btn nightowlErrorButton spacedBtn'> Delete</button>
+          <CreateSetButton pushNewSet = {props.pushNewSet}/>
+          <button onClick = {props.flushSet} className="btn nightowlOrangeButton spacedBtn"> Flush</button>
+          <button className = 'btn nightowlBlueButton spacedBtn'> Upload</button>
         </div>
       </div>
     </div>
@@ -215,21 +241,15 @@ function HistoryControlsContainer(props){
 }
 
 function CommandSet(props) {
+  let button = props.currentSet && props.currentSet ===props.setName? <button className = 'btn nightowlErrorButton' onClick = {()=>props.pushSelectedFunc(props.setName)}>  Deselect </button>
+                :
+                <button className = 'btn nightowlGreenButton' onClick = {()=>props.pushSelectedFunc(props.setName)}> Select</button>
+
+
     return (
       <div className = "commandSet">
         <p style = {{fontSize:'1.5em'}}> {props.setName} </p>
-        <div>
-          <button className = "btn nightowlErrorButton"> Delete </button>
-        </div>
-        <div>
-          <button className = "btn nightowlGreenButton"> Play </button>
-        </div>
-        <div>
-          <button> Clear </button>
-        </div>
-        <div>
-          <button onClick = {()=>props.pushSelectedFunc(props.setName)}> Select</button>
-        </div>
+        {button}
       </div>
     )
 }
@@ -247,6 +267,46 @@ function ViewSelectedCommandSet(props) {
 }
 
 
+class CreateSetButton extends React.Component {
+  constructor(props){
+    super(props) 
+    this.state = {
+      isPressed: false,
+      trackingInput: ''
+    }
+    this.onclickHandler = this.onclickHandler.bind(this);
+    this.trackInput = this.trackInput.bind(this);
+    
+  }
+
+  onclickHandler() {
+    if (this.state.isPressed) {
+        this.props.pushNewSet(this.state.trackingInput)
+        this.setState({isPressed:false})
+    }
+    else {
+      this.setState({isPressed:true})
+    }
+    
+  } 
+
+  trackInput(event) {
+    this.setState({trackingInput:event.target.value})
+  }
+
+  render() {
+    let inputBar = this.state.isPressed? <input type = "text" value= {this.state.trackingInput} onChange = {this.trackInput} /> : null;
+    return (
+      <div style= {{display:'inline-block'}}>
+      {inputBar}
+      <button onClick= {this.onclickHandler} className="btn nightowlButtons spacedBtn"> Create</button>
+      </div>
+      
+    )
+  }
+}
+
+
   
 class App extends React.Component {
   constructor(props) {
@@ -255,7 +315,7 @@ class App extends React.Component {
       streamingServer: null,
       commandServer: null,
       streamingServerAddress: "ws://192.168.1.3:8764",
-      commandServerAddress: "ws://192.168.1.3:8765",
+      commandServerAddress: "ws://localhost:8765",
       commandServerConnected: false,
       streamServerConnected: false,
       arrowPressed: false,
@@ -282,9 +342,8 @@ class App extends React.Component {
   sendDirection(event) {
     event.preventDefault();
     if (!this.state.arrowPressed & event.key in this.state.arrows) {
-      // this.state.commandServer.send(event.key)
+      this.state.commandServer.send(event.key)
       let keyAndTime = [event.key,new Date().getTime()]
-      console.log(keyAndTime)
       this.setState({ arrowPressed: true ,commandAndTime:keyAndTime})
       this.changeArrowDisplay(event.key, 'on')
 
@@ -294,7 +353,7 @@ class App extends React.Component {
 
   stopMoving(event) {
     if (event.key in this.state.arrows) {
-      // this.state.commandServer.send("stop")
+      this.state.commandServer.send("stop")
       this.setState({ arrowPressed: false,commandAndTime:["stop",new Date().getTime()]})
       this.changeArrowDisplay(event.key, 'off')
     }
@@ -316,11 +375,9 @@ class App extends React.Component {
   }
 
   render() {
-    console.log("in render",this.state.commandAndTime)
     return (
       <div id="mainPage" onKeyDown={this.sendDirection} tabIndex="0" onKeyUp={this.stopMoving}>
-
-        <Header />
+        <Header  />
         <ConnectionPanel
           createConnection={this.createConnection}
           commandServerConnected={this.state.commandServerConnected}
@@ -336,7 +393,7 @@ class App extends React.Component {
           <StreamPanel startStream={this.startStream} />
         </div>
 
-        <HistoryPanel commandAndTime = {this.state.commandAndTime} />
+        <HistoryPanel commandServerSocket = {this.state.commandServer} commandAndTime = {this.state.commandAndTime} />
       </div>
 
 
