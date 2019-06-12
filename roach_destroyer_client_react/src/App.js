@@ -244,8 +244,6 @@ function CommandSet(props) {
   let button = props.currentSet && props.currentSet ===props.setName? <button className = 'btn nightowlErrorButton' onClick = {()=>props.pushSelectedFunc(props.setName)}>  Deselect </button>
                 :
                 <button className = 'btn nightowlGreenButton' onClick = {()=>props.pushSelectedFunc(props.setName)}> Select</button>
-
-
     return (
       <div className = "commandSet">
         <p style = {{fontSize:'1.5em'}}> {props.setName} </p>
