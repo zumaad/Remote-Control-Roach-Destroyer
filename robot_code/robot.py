@@ -1,7 +1,7 @@
 
 from gpiozero import Servo
 import datetime
-from robot_code import commands
+
 
 #CONSTANTS
 PWM_PIN1 = 13
@@ -15,7 +15,6 @@ class Robot:
         self.init_at = datetime.datetime.now().time()
         self.left_servo = Servo(PWM_PIN1,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.right_servo = Servo(servo_pin2,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
-        self.command_history = []
         self.recognized_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards,'stop':self.stop,'flush':self.flush_temporary_history}
         self.command_database_url = ""
     
@@ -40,15 +39,8 @@ class Robot:
         self.left_servo.mid()
         self.right_servo.mid()
 
-    def store_command_temporarily(self,command):
-        command = commands.Command(command)
-        self.command_history.append(command)
-
-    def flush_temporary_history(self):
-        self.command_history = []
-    
+        
     def execute_command(self,command):
-        self.store_command_temporarily(command)
         correct_method = self.recognized_commands[command]
         correct_method()
     
