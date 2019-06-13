@@ -13,13 +13,13 @@ import json
 
 async def main_message_handler(websocket, path):
     print("client connected!")
-    roach_destroyer = robot.Robot()
+    # roach_destroyer = robot.Robot()
     print("roach destroyer initialized!")
     while True:
         message = await websocket.recv()
         deserialized_message = json.loads(message)
         print(deserialized_message)
-        roach_destroyer.execute_command(deserialized_message)
+        # roach_destroyer.execute_command(deserialized_message)
         
 start_server = websockets.serve(main_message_handler, '0.0.0.0', 8765)
 
