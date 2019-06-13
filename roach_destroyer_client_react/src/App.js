@@ -116,7 +116,11 @@ class HistoryPanel extends React.Component {
 
   playSet() {
     if (this.state.currentSet && this.props.commandServerSocket.readyState === 1){
-      this.props.commandServerSocket.send(JSON.stringify(this.state.commandSets[this.state.currentSet]))
+      let message = {
+        type:"playback",
+        data: this.state.commandSets[this.state.currentSet]
+      }
+      this.props.commandServerSocket.send(JSON.stringify(message))
     }
   }
 
@@ -346,7 +350,10 @@ class App extends React.Component {
   sendDirection(event) {
     event.preventDefault();
     if (!this.state.arrowPressed & event.key in this.state.arrows) {
-      // this.state.commandServer.send(event.key)
+      let message = {
+        type:"movement",
+        data:event.key}
+      this.state.commandServer.send(JSON.stringify(message))
       let keyAndTime = [event.key,new Date().getTime()]
       this.setState({ arrowPressed: true ,commandAndTime:keyAndTime})
       this.changeArrowDisplay(event.key, 'on')
@@ -357,7 +364,11 @@ class App extends React.Component {
 
   stopMoving(event) {
     if (event.key in this.state.arrows) {
-      // this.state.commandServer.send("stop")
+      let message = {
+        type:"movement",
+        data:"stop"
+      }
+      this.state.commandServer.send(JSON.stringify(message))
       this.setState({ arrowPressed: false,commandAndTime:["stop",new Date().getTime()]})
       this.changeArrowDisplay(event.key, 'off')
     }
