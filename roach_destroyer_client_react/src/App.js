@@ -323,7 +323,7 @@ class App extends React.Component {
       streamingServer: null,
       commandServer: null,
       streamingServerAddress: "ws://192.168.1.3:8764",
-      commandServerAddress: "ws://localhost:8765",
+      commandServerAddress: "ws://192.168.1.9:8765",
       commandServerConnected: false,
       streamServerConnected: false,
       arrowPressed: false,

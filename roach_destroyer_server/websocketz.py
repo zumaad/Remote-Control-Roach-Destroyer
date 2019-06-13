@@ -7,7 +7,8 @@ from picamera import PiCamera
 import base64
 import json
 
-
+def process_command_set(command_set):
+    return [(command_set[i]["command"],command_set[i+1]["time"] - command_set[i]["time"]) for i in range(0,len(command_set),2)]
 
     
 
