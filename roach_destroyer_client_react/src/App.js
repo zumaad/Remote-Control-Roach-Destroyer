@@ -83,22 +83,23 @@ class HistoryPanel extends React.Component {
     super(props);
     this.state = { 
       commandSets: 
-      {"name1":[],
-      "name2":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name3":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
-      "name4":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name5":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "name6":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
+      {"set1":[],
+      "set2":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
+      "set3":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
+      "set4":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
       currentSet:null,
-      lastTime:null}
+      lastTime:null,
+      justCreated:null}
+    this.scroller = React.createRef()
+    
       
-      this.pushSelected = this.pushSelected.bind(this);
-      this.createCommandSets = this.createCommandSets.bind(this);
-      this.gatherPairsOfCommands = this.gatherPairsOfCommands.bind(this);
-      this.pushNewSet = this.pushNewSet.bind(this);
-      this.deleteSet = this.deleteSet.bind(this);
-      this.flushSet = this.flushSet.bind(this);
-      this.playSet = this.playSet.bind(this);
+    this.pushSelected = this.pushSelected.bind(this);
+    this.createCommandSets = this.createCommandSets.bind(this);
+    this.gatherPairsOfCommands = this.gatherPairsOfCommands.bind(this);
+    this.pushNewSet = this.pushNewSet.bind(this);
+    this.deleteSet = this.deleteSet.bind(this);
+    this.flushSet = this.flushSet.bind(this);
+    this.playSet = this.playSet.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -142,7 +143,9 @@ class HistoryPanel extends React.Component {
   createCommandSets(commandSets) {
     let elementArray = []
     for (let name in commandSets){
-      elementArray.push(<CommandSet currentSet = {this.state.currentSet} pushSelectedFunc = {this.pushSelected} setName = {name}/>)
+      let possibleRef = this.state.justCreated === name? this.scroller : null
+      console.log(possibleRef)
+      elementArray.push(<CommandSet pref = {possibleRef} currentSet = {this.state.currentSet} pushSelectedFunc = {this.pushSelected} setName = {name}/>)
     }
     return elementArray
   }
@@ -167,7 +170,8 @@ class HistoryPanel extends React.Component {
   pushNewSet(setName) {
     let copiedCommandSet = JSON.parse(JSON.stringify(this.state.commandSets))
     copiedCommandSet[setName] = []
-    this.setState({commandSets:copiedCommandSet})
+    this.setState({commandSets:copiedCommandSet,justCreated:setName},() => this.scroller.current.scrollIntoView())
+    
 
   }
 
@@ -186,6 +190,7 @@ class HistoryPanel extends React.Component {
         setName = {this.state.currentSet} 
         gatherPairsOfCommands = {this.gatherPairsOfCommands}
         setName = {this.state.currentSet}/>
+        
       </div>
     )
   }
@@ -245,7 +250,7 @@ function CommandSet(props) {
                 :
                 <button className = 'btn nightowlGreenButton' onClick = {()=>props.pushSelectedFunc(props.setName)}> Select</button>
     return (
-      <div className = "commandSet">
+      <div className = "commandSet" ref = {props.pref}>
         <p style = {{fontSize:'1.5em'}}> {props.setName} </p>
         {button}
       </div>
@@ -279,8 +284,10 @@ class CreateSetButton extends React.Component {
 
   onclickHandler() {
     if (this.state.isPressed) {
-        this.props.pushNewSet(this.state.trackingInput)
-        this.setState({isPressed:false})
+        if (this.state.trackingInput) {
+          this.props.pushNewSet(this.state.trackingInput)
+        }
+        this.setState({isPressed:false,trackingInput:''})
     }
     else {
       this.setState({isPressed:true})
@@ -299,7 +306,6 @@ class CreateSetButton extends React.Component {
       {inputBar}
       <button onClick= {this.onclickHandler} className="btn nightowlButtons spacedBtn"> Create</button>
       </div>
-      
     )
   }
 }
@@ -340,7 +346,7 @@ class App extends React.Component {
   sendDirection(event) {
     event.preventDefault();
     if (!this.state.arrowPressed & event.key in this.state.arrows) {
-      this.state.commandServer.send(event.key)
+      // this.state.commandServer.send(event.key)
       let keyAndTime = [event.key,new Date().getTime()]
       this.setState({ arrowPressed: true ,commandAndTime:keyAndTime})
       this.changeArrowDisplay(event.key, 'on')
@@ -351,7 +357,7 @@ class App extends React.Component {
 
   stopMoving(event) {
     if (event.key in this.state.arrows) {
-      this.state.commandServer.send("stop")
+      // this.state.commandServer.send("stop")
       this.setState({ arrowPressed: false,commandAndTime:["stop",new Date().getTime()]})
       this.changeArrowDisplay(event.key, 'off')
     }
@@ -374,7 +380,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div id="mainPage" onKeyDown={this.sendDirection} tabIndex="0" onKeyUp={this.stopMoving}>
+      <div id="mainPage">
         <Header  />
         <ConnectionPanel
           createConnection={this.createConnection}
@@ -382,7 +388,7 @@ class App extends React.Component {
           streamServerConnected={this.state.streamServerConnected}
         />
 
-        <div id="controlsAndVideoPane">
+        <div id="controlsAndVideoPane" onKeyDown={this.sendDirection} tabIndex="0" onKeyUp={this.stopMoving}>
           <ControlPanel
             arrowUp={this.state.arrows['ArrowUp']}
             arrowDown={this.state.arrows['ArrowDown']}

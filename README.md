@@ -11,8 +11,8 @@ https://youtu.be/YflDiKFGsfs
 
 skip to :21 for some streaming action. The video isn't too good (recorded vertically) and could be filmed from a better angle, so I'll update that soon.
 
-#### Client interface pic
-![alt text](https://github.com/zumaad/Remote-Control-Roach-Destroyer/blob/master/clientInterface.png)
+#### Client interface vid
+https://www.youtube.com/watch?v=50GbFLyWaOw
 
 ### Goals: 
 - Be able to control the robot remotely (move it around) through a web interface using the websockets protocol. DONE!
