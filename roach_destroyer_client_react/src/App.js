@@ -114,10 +114,10 @@ class HistoryPanel extends React.Component {
       }
     }
 
-  playSet() {
+  playSet(mode) {
     if (this.state.currentSet && this.props.commandServerSocket.readyState === 1){
       let message = {
-        type:"playback",
+        type:mode,
         data: this.state.commandSets[this.state.currentSet]
       }
       this.props.commandServerSocket.send(JSON.stringify(message))
@@ -236,8 +236,8 @@ function HistoryControlsContainer(props){
       <div id="historyControlsPanel">
         <h3> History Controls </h3>
         <div id="buttonsPane">
-          <button onClick = {props.playSet} className = 'btn nightowlGreenButton spacedBtn'> Play</button>
-          <button className = 'btn nightowlPurpleButton spacedBtn'> Reverse </button>
+          <button onClick = {() => props.playSet("playback")} className = 'btn nightowlGreenButton spacedBtn'> Play</button>
+          <button onClick = {() => props.playSet("reverse")} className = 'btn nightowlPurpleButton spacedBtn'> Reverse </button>
           <button onClick = {props.deleteSet} className = 'btn nightowlErrorButton spacedBtn'> Delete</button>
           <CreateSetButton pushNewSet = {props.pushNewSet}/>
           <button onClick = {props.flushSet} className="btn nightowlOrangeButton spacedBtn"> Flush</button>
