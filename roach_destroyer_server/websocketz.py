@@ -7,15 +7,9 @@ from picamera import PiCamera
 import base64
 import json
 
-
-async def coro1():
-    while True:
-        print("hi")
-        await asyncio.sleep(3)
-
 async def main_message_handler(websocket, path):
     print("client connected!")
-    roach_destroyer = robot.Robot(websocket)
+    roach_destroyer = robot.Robot(websocket = websocket)
     print("roach destroyer initialized!")
     potential_task = None
     while True:
@@ -27,7 +21,7 @@ async def main_message_handler(websocket, path):
         print(deserialized_message)
         potential_task = roach_destroyer.process_message(deserialized_message)
         
-start_server = websockets.serve(main_message_handler, '0.0.0.0', 8765)
 
+start_server = websockets.serve(main_message_handler, '0.0.0.0', 8765)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()

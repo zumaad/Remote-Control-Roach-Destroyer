@@ -1,4 +1,3 @@
-
 from gpiozero import Servo,DistanceSensor
 import datetime
 import asyncio
@@ -11,6 +10,8 @@ PWM_PIN2 = 18
 DEFAULT_MIN_PULSE = 1.01/1000
 DEFAULT_MAX_PULSE = 1.99/1000
 
+
+
 class Robot:
 
     def __init__(self,websocket,servo_pin1 = PWM_PIN1,servo_pin2 = PWM_PIN2, max_pulse = DEFAULT_MAX_PULSE,min_pulse = DEFAULT_MIN_PULSE):
@@ -20,9 +21,21 @@ class Robot:
         self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.return_reverse_task,'upload':self.save_command_sets}
         self.movement_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards,'stop':self.stop}
         self.command_database_url = ""
-        asyncio.ensure_future(coro1(websocket))
         self.database_path = ""
-    
+        self.websocket = websocket
+        self.sonic_sensor = DistanceSensor(echo = 17,trigger = 4)
+        self.couroutines_on_init = [self.transmit_sonar_data]
+        self.run_scheduled_coroutines()
+        
+
+    def run_scheduled_coroutines(self):
+        for coro in self.couroutines_on_init:
+            asyncio.ensure_future(coro())
+
+    async def transmit_sonar_data(self):
+        while True:
+            await self.websocket.send(str(round(self.sonic_sensor.distance * 100,2)))
+            await asyncio.sleep(.5)
         
     def move_forward(self):
         self.left_servo.max()
@@ -85,21 +98,11 @@ class Robot:
         with open(self.database_path) as database:
             return database.read()
 
-
-        
     def process_message(self,message):
         message_type,message_data = message['type'],message['data']
         correct_method = self.command_type_to_method[message_type] #returns a method
         return correct_method(message_data)  #this can potentially return a coroutine which can be cancelled in the main loop
         
-async def coro1(websocket):
-    while True:
-        await websocket.send("hi")
-        print("hi")
-        await asyncio.sleep(3)        
-
-    
-
 class RobotUtils:
 
   @staticmethod
