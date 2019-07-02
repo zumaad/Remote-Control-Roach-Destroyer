@@ -350,6 +350,7 @@ class App extends React.Component {
     this.changeArrowDisplay = this.changeArrowDisplay.bind(this)
     this.startStream = this.startStream.bind(this);
     this.handleCommandServerMessages = this.handleCommandServerMessages.bind(this);
+    this.handleStreamMessages = this.handleStreamMessages.bind(this)
   }
 
   createConnection() {
@@ -363,7 +364,8 @@ class App extends React.Component {
   }
 
   handleCommandServerMessages(data) {
-    this.setState({recivedCommandSets:data})
+    console.log(data)
+    // this.setState({recivedCommandSets:data})
   }
 
 
