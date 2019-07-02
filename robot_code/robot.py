@@ -17,10 +17,11 @@ class Robot:
         self.init_at = datetime.datetime.now().time()
         self.left_servo = Servo(PWM_PIN1,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.right_servo = Servo(servo_pin2,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
-        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.return_reverse_task}
+        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.return_reverse_task,'upload':self.save_command_sets}
         self.movement_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards,'stop':self.stop}
         self.command_database_url = ""
         asyncio.ensure_future(coro1(websocket))
+        self.database_path = ""
     
         
     def move_forward(self):
@@ -75,6 +76,15 @@ class Robot:
     def execute_movement(self,direction):
         correct_method = self.movement_commands[direction]
         correct_method()
+
+    def save_command_sets(self,command_set):
+        with open(self.database_path,'w') as database:
+            database.write(command_set)
+    
+    def send_command_sets(self):
+        with open(self.database_path) as database:
+            return database.read()
+
 
         
     def process_message(self,message):

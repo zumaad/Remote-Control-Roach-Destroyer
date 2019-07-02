@@ -100,6 +100,7 @@ class HistoryPanel extends React.Component {
     this.deleteSet = this.deleteSet.bind(this);
     this.flushSet = this.flushSet.bind(this);
     this.playSet = this.playSet.bind(this);
+    this.uploadSets = this.uploadSets.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -112,6 +113,10 @@ class HistoryPanel extends React.Component {
         this.setState({commandSets:copiedCommandSet,lastTime:recievedTime})
       }
       }
+    if (this.state.commandSets === []) {
+      let recievedCommandSets = JSON.parse(nextProps.recivedCommandSets)
+      this.setState({recievedCommandSets:recievedCommandSets})
+    }
     }
 
   playSet(mode) {
@@ -174,9 +179,15 @@ class HistoryPanel extends React.Component {
   pushNewSet(setName) {
     let copiedCommandSet = JSON.parse(JSON.stringify(this.state.commandSets))
     copiedCommandSet[setName] = []
-    this.setState({commandSets:copiedCommandSet,justCreated:setName},() => this.scroller.current.scrollIntoView())
-    
+    this.setState({commandSets:copiedCommandSet,justCreated:setName},() => this.scroller.current.scrollIntoView({behavior:'smooth'}))
+  }
 
+  uploadSets() {
+    let message = {
+      type:'upload',
+      data:this.state.commandSets
+    }
+    this.props.commandServerSocket.send(JSON.stringify(message))
   }
 
   render() {
@@ -186,7 +197,8 @@ class HistoryPanel extends React.Component {
         pushNewSet = {this.pushNewSet}
         deleteSet = {this.deleteSet}
         flushSet = {this.flushSet}
-        playSet = {this.playSet}/>
+        playSet = {this.playSet}
+        uploadSets = {this.uploadSets}/>
 
         <CommandsHistoryContainer 
         createCommandSetsFunc = {this.createCommandSets} 
@@ -241,7 +253,7 @@ function HistoryControlsContainer(props){
           <button onClick = {props.deleteSet} className = 'btn nightowlErrorButton spacedBtn'> Delete</button>
           <CreateSetButton pushNewSet = {props.pushNewSet}/>
           <button onClick = {props.flushSet} className="btn nightowlOrangeButton spacedBtn"> Flush</button>
-          <button className = 'btn nightowlBlueButton spacedBtn'> Upload</button>
+          <button onClick = {props.uploadSets} className = 'btn nightowlBlueButton spacedBtn'> Upload</button>
         </div>
       </div>
     </div>
@@ -322,30 +334,40 @@ class App extends React.Component {
     this.state = {
       streamingServer: null,
       commandServer: null,
-      streamingServerAddress: "ws://192.168.1.3:8764",
-      commandServerAddress: "ws://192.168.1.9:8765",
+      streamingServerAddress: "ws://192.168.1.7:8764",
+      commandServerAddress: "ws://192.168.1.7:8765",
       commandServerConnected: false,
       streamServerConnected: false,
       arrowPressed: false,
       arrows: { 'ArrowUp': 'unlitArrowUp', 'ArrowDown': 'unlitArrowDown', 'ArrowRight': 'unlitArrowRight', 'ArrowLeft': 'unlitArrowLeft' },
-      commandAndTime:[]
-
+      commandAndTime:[],
+      recivedCommandSets:null
     }
+
     this.createConnection = this.createConnection.bind(this);
     this.sendDirection = this.sendDirection.bind(this);
     this.stopMoving = this.stopMoving.bind(this);
     this.changeArrowDisplay = this.changeArrowDisplay.bind(this)
     this.startStream = this.startStream.bind(this);
+    this.handleCommandServerMessages = this.handleCommandServerMessages.bind(this);
+    this.handleStreamMessages = this.handleStreamMessages.bind(this)
   }
 
   createConnection() {
     let commandSocket = new WebSocket(this.state.commandServerAddress)
     commandSocket.onopen = () => (this.setState({ commandServer: commandSocket, commandServerConnected: true }))
+    commandSocket.onmessage = (event) => this.handleCommandServerMessages(event.data)
 
     let streamingSocket = new WebSocket(this.state.streamingServerAddress)
     streamingSocket.onopen = () => this.setState({ streamingServer: streamingSocket, streamServerConnected: true })
     streamingSocket.onmessage = (event) => this.handleStreamMessages(event.data)
   }
+
+  handleCommandServerMessages(data) {
+    console.log(data)
+    // this.setState({recivedCommandSets:data})
+  }
+
 
   sendDirection(event) {
     event.preventDefault();
@@ -408,7 +430,7 @@ class App extends React.Component {
           <StreamPanel startStream={this.startStream} />
         </div>
 
-        <HistoryPanel commandServerSocket = {this.state.commandServer} commandAndTime = {this.state.commandAndTime} />
+        <HistoryPanel  recivedCommandSets = {this.state.recivedCommandSets} commandServerSocket = {this.state.commandServer} commandAndTime = {this.state.commandAndTime} />
       </div>
 
 
