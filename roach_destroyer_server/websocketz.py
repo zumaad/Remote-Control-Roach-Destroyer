@@ -8,17 +8,21 @@ import base64
 import json
 
 
-    
+async def coro1():
+    while True:
+        print("hi")
+        await asyncio.sleep(3)
 
 async def main_message_handler(websocket, path):
     print("client connected!")
-    roach_destroyer = robot.Robot()
+    roach_destroyer = robot.Robot(websocket)
     print("roach destroyer initialized!")
     potential_task = None
     while True:
         message = await websocket.recv()
         if potential_task:
             potential_task.cancel()
+            potential_task = None
         deserialized_message = json.loads(message)
         print(deserialized_message)
         potential_task = roach_destroyer.process_message(deserialized_message)

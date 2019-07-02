@@ -1,5 +1,5 @@
 
-from gpiozero import Servo
+from gpiozero import Servo,DistanceSensor
 import datetime
 import asyncio
 import time
@@ -13,13 +13,14 @@ DEFAULT_MAX_PULSE = 1.99/1000
 
 class Robot:
 
-    def __init__(self,servo_pin1 = PWM_PIN1,servo_pin2 = PWM_PIN2, max_pulse = DEFAULT_MAX_PULSE,min_pulse = DEFAULT_MIN_PULSE):
+    def __init__(self,websocket,servo_pin1 = PWM_PIN1,servo_pin2 = PWM_PIN2, max_pulse = DEFAULT_MAX_PULSE,min_pulse = DEFAULT_MIN_PULSE):
         self.init_at = datetime.datetime.now().time()
         self.left_servo = Servo(PWM_PIN1,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.right_servo = Servo(servo_pin2,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.return_reverse_task}
         self.movement_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards,'stop':self.stop}
         self.command_database_url = ""
+        asyncio.ensure_future(coro1(websocket))
     
         
     def move_forward(self):
@@ -81,7 +82,11 @@ class Robot:
         correct_method = self.command_type_to_method[message_type] #returns a method
         return correct_method(message_data)  #this can potentially return a coroutine which can be cancelled in the main loop
         
-        
+async def coro1(websocket):
+    while True:
+        await websocket.send("hi")
+        print("hi")
+        await asyncio.sleep(3)        
 
     
 
