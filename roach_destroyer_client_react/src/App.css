@@ -202,3 +202,11 @@ body {
 .connectedText {
   color: #addb67
 }
+
+#sonarText {
+  font-size: 2em;
+}
+
+#sonarDisplayBox {
+  text-align: center;
+}
