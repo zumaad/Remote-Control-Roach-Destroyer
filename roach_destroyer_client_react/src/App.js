@@ -326,6 +326,13 @@ class CreateSetButton extends React.Component {
   }
 }
 
+function SonicRadarDisplay(props) {
+  return (
+  <div id = "sonarDisplayBox">
+    <p id = "sonarText">Awaiting Sonar Data</p>
+  </div>)
+}
+
 
   
 class App extends React.Component {
@@ -364,7 +371,20 @@ class App extends React.Component {
   }
 
   handleCommandServerMessages(data) {
-    console.log(data)
+    let color;
+    let sonarText = document.getElementById('sonarText')
+    let floatData = parseFloat(data)
+    if (floatData >= 60) {
+      color = '#7fdbca'
+    }
+    else if (floatData >= 30 && floatData <60){
+      color = '#F78C6C'
+    }
+    else {
+      color = '#ff5874'
+    }
+    sonarText.innerHTML = "object is " + floatData + " cm away!"
+    sonarText.style.color = color;
     // this.setState({recivedCommandSets:data})
   }
 
@@ -429,11 +449,10 @@ class App extends React.Component {
             arrowRight={this.state.arrows['ArrowRight']} />
           <StreamPanel startStream={this.startStream} />
         </div>
-
+        <SonicRadarDisplay></SonicRadarDisplay>
         <HistoryPanel  recivedCommandSets = {this.state.recivedCommandSets} commandServerSocket = {this.state.commandServer} commandAndTime = {this.state.commandAndTime} />
+        
       </div>
-
-
     );
   }
 }
