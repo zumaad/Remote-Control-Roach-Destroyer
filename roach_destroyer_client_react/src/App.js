@@ -353,6 +353,7 @@ class SonicRadarDisplay extends React.Component {
     this.initializeCanvasNavLines()
     this.drawRobotBox()
     this.initializeCanvasText()    
+    
   }
 
   initializeCanvasCircles() {
@@ -415,7 +416,7 @@ class SonicRadarDisplay extends React.Component {
       canvasContext.fillText(distance.toString(),this.centerX + (i * this.radius/10) - 16,this.centerY + 10)
     }
   }
-  
+
   componentDidMount() {
     this.initializeCanvasDisplay()
   }
@@ -433,6 +434,14 @@ class SonicRadarDisplay extends React.Component {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.canvasHeight = 500
+    this.canvasWidth = 500
+    this.backgroundColor = '#272727'
+    this.radius = 240
+    this.centerX = this.canvasWidth/2
+    this.centerY = this.canvasHeight/2
+    this.green = '#00FF33'
+    this.red = '#ff5874'
     this.state = {
       streamingServer: null,
       commandServer: null,
@@ -458,7 +467,12 @@ class App extends React.Component {
     
   }
 
+  // componentDidMount() {
+  //   this.drawLine(45,80)
+  // }
+
   createConnection() {
+    
     let commandSocket = new WebSocket(this.state.commandServerAddress)
     commandSocket.onopen = () => (this.setState({ commandServer: commandSocket, commandServerConnected: true }))
     commandSocket.onmessage = (event) => this.handleCommandServerMessages(event.data)
@@ -469,6 +483,8 @@ class App extends React.Component {
   }
 
   handleCommandServerMessages(data) {
+    let decodedData = JSON.parse(data)
+    this.drawLine(decodedData[0],decodedData[1])
     
   }
 
@@ -515,17 +531,36 @@ class App extends React.Component {
     this.state.streamingServer.send("start stream")
   }
 
-  drawLine(angle){
-    let radians = (Math.PI/180.0) * -angle
+  drawLine(angle,contactDistance){
+    /**
+     * the servo goes from 90 to -90 and the servo's -90, is actually 0 here as the
+     * servo has 0 degrees as its starting position when its pointing perpendicular
+     * to the x and y axis instead of the right x axis being 0 degrees.
+     *  */ 
+    console.log("draw line")
+    let distanceRatio = (contactDistance/100 * this.radius)
+    let radians = (Math.PI/180.0) * -(angle + 90)
     let canvas = document.getElementById("sonarCanvas");
     let canvasContext = canvas.getContext("2d");
-    let yDistance = this.radius * Math.sin(radians)
-    let xDistance = this.radius * Math.cos(radians)
-    canvasContext.strokeStyle = this.red
+    
+    let yDistance = distanceRatio * Math.sin(radians)
+    let xDistance = distanceRatio * Math.cos(radians)
+    let greenlineCoordinates = [this.centerX + xDistance,this.centerY + yDistance]
+    canvasContext.strokeStyle = this.green
     canvasContext.beginPath()
     canvasContext.moveTo(this.centerX,this.centerY)
     canvasContext.lineTo(this.centerX + xDistance,this.centerY + yDistance)
     canvasContext.stroke()
+    
+    canvasContext.strokeStyle = this.red
+    canvasContext.beginPath()
+    canvasContext.moveTo(greenlineCoordinates[0],greenlineCoordinates[1])
+    let leftOverRadius = this.radius - distanceRatio
+    yDistance = leftOverRadius * Math.sin(radians)
+    xDistance = leftOverRadius * Math.cos(radians)
+    canvasContext.lineTo(greenlineCoordinates[0] + xDistance,greenlineCoordinates[1] + yDistance)
+    canvasContext.stroke()
+
   }
 
   render() {
