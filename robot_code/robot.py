@@ -1,7 +1,7 @@
 from gpiozero import Servo,DistanceSensor,AngularServo
 import datetime
 import asyncio
-import time
+from time import sleep
 from itertools import chain
 import json
 
@@ -34,14 +34,15 @@ class Robot:
     def run_scheduled_coroutines(self):
         for coro in self.couroutines_on_init:
             asyncio.ensure_future(coro())
+            
 
     async def transmit_sonar_data(self):
         self.angular_servo.min()
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
         while True:
             for i in chain(range(-90,90),range(90,-90,-1)):
                 self.angular_servo.angle = i
-                asyncio.sleep(.004)
+                await asyncio.sleep(.004)
                 angle_and_distance = json.dumps((i,round(self.sonic_sensor.distance * 100,2)))
                 await self.websocket.send(angle_and_distance)
             
