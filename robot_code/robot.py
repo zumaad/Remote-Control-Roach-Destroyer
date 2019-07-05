@@ -45,6 +45,7 @@ class Robot:
                 await asyncio.sleep(.004)
                 angle_and_distance = json.dumps((i,round(self.sonic_sensor.distance * 100,2)))
                 await self.websocket.send(angle_and_distance)
+            return 
             
         
     def move_forward(self):
