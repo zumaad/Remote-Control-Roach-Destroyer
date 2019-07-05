@@ -1,4 +1,4 @@
-from gpiozero import Servo,DistanceSensor
+from gpiozero import Servo,DistanceSensor,AngularServo
 import datetime
 import asyncio
 import time
@@ -40,9 +40,9 @@ class Robot:
         asyncio.sleep(1)
         while True:
             for i in chain(range(-90,90),range(90,-90,-1)):
-                s.angle = i
+                self.angular_servo.angle = i
                 asyncio.sleep(.004)
-                angle_and_distance = json.dumps((i,round(self.sonic_sensor.distance * 100,2))
+                angle_and_distance = json.dumps((i,round(self.sonic_sensor.distance * 100,2)))
                 await self.websocket.send(angle_and_distance)
             
         
