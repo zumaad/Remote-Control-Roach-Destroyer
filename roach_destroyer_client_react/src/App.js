@@ -13,7 +13,9 @@ import unlitArrowLeft from './assets/unlitleft.png'
 
 const arrowImages = { 'litArrowUp': litArrowUp, 'litArrowDown': litArrowDown, 'litArrowRight': litArrowRight, 'litArrowLeft': litArrowLeft, 'unlitArrowUp': unlitArrowUp, 'unlitArrowDown': unlitArrowDown, 'unlitArrowRight': unlitArrowRight, 'unlitArrowLeft': unlitArrowLeft }
 
+function setUpCanvas(){
 
+}
 
 function ControlPanel(props) {
   return (
@@ -326,15 +328,108 @@ class CreateSetButton extends React.Component {
   }
 }
 
-function SonicRadarDisplay(props) {
-  return (
-  <div id = "sonarDisplayBox">
-    <p id = "sonarText">Awaiting Sonar Data</p>
-  </div>)
+//made this a react componenet so i could hook it into existing interface code more easily
+class SonicRadarDisplay extends React.Component {
+  constructor(props) {
+    super(props);
+    this.canvasHeight = 500
+    this.canvasWidth = 500
+    this.backgroundColor = '#272727'
+    this.radius = 240
+    this.centerX = this.canvasWidth/2
+    this.centerY = this.canvasHeight/2
+    this.green = '#00FF33'
+    this.red = '#ff5874'
+    
+    this.initializeCanvasDisplay = this.initializeCanvasDisplay.bind(this);
+    this.initializeCanvasCircles = this.initializeCanvasCircles.bind(this);
+    this.initializeCanvasNavLines = this.initializeCanvasNavLines.bind(this);
+    this.initializeCanvasText = this.initializeCanvasText.bind(this);
+    this.drawRobotBox = this.drawRobotBox.bind(this);
+  }
+
+  initializeCanvasDisplay() {
+    this.initializeCanvasCircles()
+    this.initializeCanvasNavLines()
+    this.drawRobotBox()
+    this.initializeCanvasText()    
+  }
+
+  initializeCanvasCircles() {
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+    canvasContext.lineWidth = 6;
+    canvasContext.strokeStyle = this.green
+    canvasContext.fillStyle = this.backgroundColor
+    for (let i=10;i >-1;i--) {
+      if (i === 10){
+        canvasContext.beginPath();
+        canvasContext.arc(this.centerX, this.centerY, this.radius/10 * i, 0, 2 * Math.PI);
+        canvasContext.stroke();
+        canvasContext.fill()
+        canvasContext.lineWidth = 1
+      }
+      else {
+        canvasContext.beginPath()
+        canvasContext.arc(this.centerX, this.centerY, this.radius/10 * i, 0, 2 * Math.PI);
+        canvasContext.stroke()
+      }
+    }
+  }
+
+  initializeCanvasNavLines() {
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+    canvasContext.strokeStyle = this.green
+    
+    let lineEndPoints = [[this.centerX,this.centerY + this.radius],[this.centerX,this.centerY - this.radius],
+                          [this.centerX + this.radius, this.centerY],[this.centerX - this.radius,this.centerY]]
+    
+    lineEndPoints.forEach((coordinates) => {
+      canvasContext.beginPath()
+      canvasContext.moveTo(this.centerX,this.centerY)
+      canvasContext.lineTo(coordinates[0],coordinates[1])
+      canvasContext.stroke()
+    })
+  }
+
+  drawRobotBox() {
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+    canvasContext.fillStyle = this.red
+    canvasContext.beginPath()
+    canvasContext.rect(this.centerX-10,this.centerY-6,20,30)
+    canvasContext.fill()
+  }
+
+  initializeCanvasText() {
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+    canvasContext.fillStyle = this.green
+    canvasContext.font = "20px"
+    for (let i=1;i<11;i++) {
+      let distance = i * 10
+      // +-3 or whatever offset is to make it sit above the axes or to the right,etc.
+      canvasContext.fillText(distance.toString(),this.centerX + 3,this.centerY -(i * this.radius/10)+10)
+      canvasContext.fillText(distance.toString(),this.centerX - (i * this.radius/10),this.centerY + 10)
+      canvasContext.fillText(distance.toString(),this.centerX + (i * this.radius/10) - 16,this.centerY + 10)
+    }
+  }
+  
+  componentDidMount() {
+    this.initializeCanvasDisplay()
+  }
+
+  render() {
+    return (
+    <div id = "sonarDisplayBox">
+      <canvas id = "sonarCanvas" width = '500' height = '500' ></canvas>
+    </div>)
+  }
+  
 }
 
 
-  
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -350,6 +445,7 @@ class App extends React.Component {
       commandAndTime:[],
       recivedCommandSets:null
     }
+    
 
     this.createConnection = this.createConnection.bind(this);
     this.sendDirection = this.sendDirection.bind(this);
@@ -358,6 +454,8 @@ class App extends React.Component {
     this.startStream = this.startStream.bind(this);
     this.handleCommandServerMessages = this.handleCommandServerMessages.bind(this);
     this.handleStreamMessages = this.handleStreamMessages.bind(this)
+    this.drawLine = this.drawLine.bind(this);
+    
   }
 
   createConnection() {
@@ -371,21 +469,7 @@ class App extends React.Component {
   }
 
   handleCommandServerMessages(data) {
-    let color;
-    let sonarText = document.getElementById('sonarText')
-    let floatData = parseFloat(data)
-    if (floatData >= 60) {
-      color = '#7fdbca'
-    }
-    else if (floatData >= 30 && floatData <60){
-      color = '#F78C6C'
-    }
-    else {
-      color = '#ff5874'
-    }
-    sonarText.innerHTML = "object is " + floatData + " cm away!"
-    sonarText.style.color = color;
-    // this.setState({recivedCommandSets:data})
+    
   }
 
 
@@ -429,6 +513,19 @@ class App extends React.Component {
 
   startStream() {
     this.state.streamingServer.send("start stream")
+  }
+
+  drawLine(angle){
+    let radians = (Math.PI/180.0) * -angle
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+    let yDistance = this.radius * Math.sin(radians)
+    let xDistance = this.radius * Math.cos(radians)
+    canvasContext.strokeStyle = this.red
+    canvasContext.beginPath()
+    canvasContext.moveTo(this.centerX,this.centerY)
+    canvasContext.lineTo(this.centerX + xDistance,this.centerY + yDistance)
+    canvasContext.stroke()
   }
 
   render() {
