@@ -546,7 +546,7 @@ class App extends React.Component {
     let radians = (Math.PI/180.0) * -(angle + 90)
     let canvas = document.getElementById("sonarCanvas");
     let canvasContext = canvas.getContext("2d");
-    if (angle === 90 || angle === -90) {
+    if (angle === 90 || angle === -80) {
       canvasContext.putImageData(this.state.cleanSonar,0,0)
     }
     
