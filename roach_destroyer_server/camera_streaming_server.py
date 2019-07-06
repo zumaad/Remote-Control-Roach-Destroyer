@@ -14,10 +14,10 @@ async def start_streaming(websocket):
     while True:
         my_stream = BytesIO()
         camera.capture(my_stream,quality=20,format ='jpeg',use_video_port=True)
-        bytes_from_stream = my_stream.getvalue()
-        base64str = base64.encodestring(bytes_from_stream).decode()
+        bytes_from_frame = my_stream.getvalue()
+        base64str = base64.encodestring(bytes_from_frame).decode()
         await websocket.send(base64str)
-        asyncio.sleep(.05)
+        await asyncio.sleep(.05)
 
     
 
