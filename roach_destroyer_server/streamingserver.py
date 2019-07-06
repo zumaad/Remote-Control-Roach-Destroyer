@@ -15,7 +15,6 @@ async def start_streaming(websocket):
         my_stream = BytesIO()
         camera.capture(my_stream,quality=20,format ='jpeg',use_video_port=True)
         bytes_from_stream = my_stream.getvalue()
-        print(len(bytes_from_stream))
         base64str = base64.encodestring(bytes_from_stream).decode()
         await websocket.send(base64str)
         asyncio.sleep(.05)
@@ -26,7 +25,7 @@ async def start_streaming(websocket):
 
  
 async def main_message_handler(websocket, path):
-    print("client connected!")
+    print("client connected to streaming server!")
 
     while True:
         message = await websocket.recv()
