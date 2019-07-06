@@ -452,7 +452,8 @@ class App extends React.Component {
       arrowPressed: false,
       arrows: { 'ArrowUp': 'unlitArrowUp', 'ArrowDown': 'unlitArrowDown', 'ArrowRight': 'unlitArrowRight', 'ArrowLeft': 'unlitArrowLeft' },
       commandAndTime:[],
-      recivedCommandSets:null
+      recivedCommandSets:null,
+      cleanSonar:null
     }
     
 
@@ -467,9 +468,12 @@ class App extends React.Component {
     
   }
 
-  // componentDidMount() {
-  //   this.drawLine(45,80)
-  // }
+  componentDidMount() {
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+    let cleanState = canvasContext.getImageData(0,0,canvas.width,canvas.height);
+    this.setState({cleanSonar:cleanState})
+  }
 
   createConnection() {
     
@@ -542,6 +546,9 @@ class App extends React.Component {
     let radians = (Math.PI/180.0) * -(angle + 90)
     let canvas = document.getElementById("sonarCanvas");
     let canvasContext = canvas.getContext("2d");
+    if (angle === 90 || angle === -90) {
+      canvasContext.putImageData(this.state.cleanSonar,0,0)
+    }
     
     let yDistance = distanceRatio * Math.sin(radians)
     let xDistance = distanceRatio * Math.cos(radians)
