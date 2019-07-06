@@ -85,10 +85,10 @@ class HistoryPanel extends React.Component {
     super(props);
     this.state = { 
       commandSets: 
-      {"set1":[],
-      "set2":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "set3":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
-      "set4":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
+      {"set up":[],
+      "go to kitchen":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
+      "twirl":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
+      "square movement":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
       currentSet:null,
       lastTime:null,
       justCreated:null}
