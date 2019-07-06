@@ -430,17 +430,15 @@ class SonicRadar{
      * servo has 0 degrees as its starting position when its pointing perpendicular
      * to the x and y axis instead of the right x axis being 0 degrees.
      *  */ 
-    let distanceRatio = (contactDistance/100 * this.radius)
-    let radians = (Math.PI/180.0) * -(angle + 90)
     let canvas = document.getElementById("sonarCanvas");
     let canvasContext = canvas.getContext("2d");
-    //rever the radar to a state where no lines are drawn when one sweep is compelete
-    if (angle === 90 || angle === -80) {
-      canvasContext.putImageData(this.cleanState,0,0)
-    }
+
+    let radians = (Math.PI/180.0) * -(angle + 90)
     
-    let yDistance = distanceRatio * Math.sin(radians)
-    let xDistance = distanceRatio * Math.cos(radians)
+    let greenLineLength = (contactDistance/100 * this.radius)
+    
+    let yDistance = greenLineLength * Math.sin(radians)
+    let xDistance = greenLineLength * Math.cos(radians)
     let greenlineCoordinates = [this.centerX + xDistance,this.centerY + yDistance]
     canvasContext.strokeStyle = this.green
     canvasContext.beginPath()
@@ -451,11 +449,16 @@ class SonicRadar{
     canvasContext.strokeStyle = this.red
     canvasContext.beginPath()
     canvasContext.moveTo(greenlineCoordinates[0],greenlineCoordinates[1])
-    let leftOverRadius = this.radius - distanceRatio
-    yDistance = leftOverRadius * Math.sin(radians)
-    xDistance = leftOverRadius * Math.cos(radians)
+    let redLineLength = this.radius - greenLineLength
+    yDistance = redLineLength * Math.sin(radians)
+    xDistance = redLineLength * Math.cos(radians)
     canvasContext.lineTo(greenlineCoordinates[0] + xDistance,greenlineCoordinates[1] + yDistance)
     canvasContext.stroke()
+
+    //revert the radar to a state where no lines are drawn when one sweep is compelete
+    if (angle === 90 || angle === -80) {
+      canvasContext.putImageData(this.cleanState,0,0)
+    }
   }
 }
 
@@ -491,6 +494,11 @@ class App extends React.Component {
 
   componentDidMount() {
     this.sonicRadar.initializeCanvasDisplay()
+    // this.sonicRadar.drawLine(60,50)
+
+    for (let i =-80; i < 91;i++) {
+      setTimeout(()=>this.sonicRadar.drawLine(i,50),i*50)
+    }
   }
 
   createConnection() {
