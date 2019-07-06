@@ -42,7 +42,7 @@ class Robot:
         while True:
             for i in chain(range(-90,90),range(90,-90,-1)):
                 self.angular_servo.angle = i
-                await asyncio.sleep(.018)
+                await asyncio.sleep(.03) # fastest is like .004
                 angle_and_distance = json.dumps((i,round(self.sonic_sensor.distance * 100,2)))
                 await self.websocket.send(angle_and_distance)
             return 
