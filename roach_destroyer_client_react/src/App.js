@@ -445,8 +445,8 @@ class App extends React.Component {
     this.state = {
       streamingServer: null,
       commandServer: null,
-      streamingServerAddress: "ws://192.168.1.7:8764",
-      commandServerAddress: "ws://192.168.1.7:8765",
+      streamingServerAddress: "ws://172.20.10.7:8764",
+      commandServerAddress: "ws://172.20.10.7:8765",
       commandServerConnected: false,
       streamServerConnected: false,
       arrowPressed: false,
