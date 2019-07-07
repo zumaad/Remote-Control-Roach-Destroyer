@@ -494,11 +494,7 @@ class App extends React.Component {
 
   componentDidMount() {
     this.sonicRadar.initializeCanvasDisplay()
-    // this.sonicRadar.drawLine(60,50)
-
-    for (let i =-80; i < 91;i++) {
-      setTimeout(()=>this.sonicRadar.drawLine(i,50),i*50)
-    }
+    
   }
 
   createConnection() {
