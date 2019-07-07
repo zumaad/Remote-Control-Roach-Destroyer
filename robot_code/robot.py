@@ -20,26 +20,22 @@ class Robot:
         self.init_at = datetime.datetime.now().time()
         self.left_servo = Servo(PWM_PIN1,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.right_servo = Servo(servo_pin2,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
-        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.return_reverse_task,'upload':self.save_command_sets,'sonar':self.handle_sonar}
+        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.handle_reverse_task,'upload':self.save_command_sets,'sonar':self.handle_sonar}
         self.movement_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards,'stop':self.stop}
         self.command_database_url = ""
         self.database_path = ""
         self.websocket = websocket
         self.sonic_sensor = DistanceSensor(echo = 17,trigger = 4)
         self.angular_servo = AngularServo(21,max_pulse_width = 2/1000,min_pulse_width = 1/10000)
-        self.current_running_tasks = {}
+        self.current_background_tasks = {}
         
 
     def handle_sonar(self,message):
         if message == 'start':
             sonar_task = asyncio.ensure_future(self.transmit_sonar_data())
-            self.current_running_tasks['sonar'] = sonar_task
+            self.current_background_tasks['sonar'] = sonar_task
         elif message == 'stop':
-            self.current_running_tasks['sonar'].cancel()
-
-    def return_transmit_sonar_task(self):
-        task = asyncio.ensure_future(self.transmit_sonar_data()) 
-        self.current_running_task = task  
+            self.current_background_tasks['sonar'].cancel() 
 
     async def transmit_sonar_data(self):
         self.angular_servo.min()
@@ -74,9 +70,9 @@ class Robot:
         self.left_servo.mid()
         self.right_servo.mid()
 
-    def return_reverse_task(self,command_set):
-        task = asyncio.ensure_future(self.execute_reverse(command_set))
-        return task
+    def handle_reverse_task(self,command_set):
+        reverse_task = asyncio.ensure_future(self.execute_reverse(command_set))
+        self.current_background_tasks['movement'] = reverse_task
     
     async def execute_reverse(self,command_set):
         reversed_directions = {'ArrowUp':'ArrowDown','ArrowDown':'ArrowUp','ArrowRight':'ArrowLeft','ArrowLeft':'ArrowRight'}
@@ -103,6 +99,9 @@ class Robot:
             self.stop()
     
     def execute_movement(self,direction):
+        if 'movement' in self.current_background_tasks and self.current_background_tasks['movements']:
+            self.current_background_tasks['movement'].cancel()
+            self.current_background_tasks['movement'] = None
         correct_method = self.movement_commands[direction]
         correct_method()
 
