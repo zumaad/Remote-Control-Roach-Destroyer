@@ -346,7 +346,7 @@ class SonicRadarDisplay extends React.Component {
   }
 
   sonarButtonHandler() {
-    let message = this.state.buttonPressed? "start":"stop"
+    let message = this.state.buttonPressed? "stop":"start"
     this.props.startStopSonar(message)
     this.setState((prevState) => ({buttonPressed:!prevState.buttonPressed}))
   }
@@ -587,7 +587,11 @@ class App extends React.Component {
   }
 
   startStopSonar(message) {
-    this.state.commandServer.send(message)
+    let jsonMessage = 
+      {type:"sonar",
+      data:message
+    }
+    this.state.commandServer.send(JSON.stringify(jsonMessage))
   }
 
 
