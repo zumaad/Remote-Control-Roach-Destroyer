@@ -27,21 +27,15 @@ class Robot:
         self.websocket = websocket
         self.sonic_sensor = DistanceSensor(echo = 17,trigger = 4)
         self.angular_servo = AngularServo(21,max_pulse_width = 2/1000,min_pulse_width = 1/10000)
-        # self.couroutines_on_init = [self.transmit_sonar_data]
-        # self.run_scheduled_coroutines()
-        self.current_running_task = None
+        self.current_running_tasks = []
         
-
-    # def run_scheduled_coroutines(self):
-    #     for coro in self.couroutines_on_init:
-    #         asyncio.ensure_future(coro())
 
     def handle_sonar(self,message):
         if message == 'start':
             sonar_task = asyncio.ensure_future(self.transmit_sonar_data())
-            self.current_running_task = sonar_task
+            self.current_running_tasks.append(sonar_task)
         elif message == 'stop':
-            self.current_running_task.cancel()
+            self.current_running_tasks[0].cancel()
 
     def return_transmit_sonar_task(self):
         task = asyncio.ensure_future(self.transmit_sonar_data()) 
