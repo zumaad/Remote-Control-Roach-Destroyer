@@ -16,7 +16,7 @@ async def start_streaming(websocket,camera):
         bytes_from_frame = my_stream.getvalue()
         base64str = base64.encodestring(bytes_from_frame).decode()
         await websocket.send(base64str)
-        await asyncio.sleep(.05)
+        await asyncio.sleep(.01)
 
     
  
