@@ -5,30 +5,33 @@
 
 
 ### Current progress
-I can control the robot remotely and have it stream back the camera feed to the client (browser)!
+I
+- can control the robot remotely(make it move in all directions,turn on camera,sonar, etc)
+- can stream back its surroundings with the camera and see it on the frontend
+- can stream back sonar data that get from my sonar sensor and then use it to create a radar chart that allows me to see the distances of objects around my robot
+- can store sets of commands on the front end and then play them again,play them in reverse, or upload them to the robot to be accessed later.
+- can control when the background tasks like the sonar sensor/servo,playbacks,or camera turn on and off.
+
+The video below is old. I'm going to update this with a newer video soon.
 
 https://youtu.be/YflDiKFGsfs 
 
-skip to :21 for some streaming action. The video isn't too good (recorded vertically) and could be filmed from a better angle, so I'll update that soon.
+
 
 #### Client interface vid
+Client vid is old too, gonna upload a vid of the newer interface soon.
+
 https://www.youtube.com/watch?v=50GbFLyWaOw
 
-### Goals: 
-- Be able to control the robot remotely (move it around) through a web interface using the websockets protocol. DONE!
-- Have it also stream back a camera feed of its surroundings. DONE!
-- I should also be able to have control over the command history of the robot so you can choose commands to save, what commands to play back, choose a set of commands to play in reverse so it goes back to its original position, etc. 
-- Be able to visualize its path and try to come up with cool ideas about it communicating its position and stuff like that.
 
-Long term goals: Give it have a laser that I can also control remotely. Have it be able to process the camera feed and recognize objects using ML :)
 
 ### Overview: 
 - Webserver (literally just a while True loop that waits for messages) runs on raspberrypi and listens on a certain port for client's messages. 
 - Through a web interface (made with javascript using the native WebSocket API to communicate with the server), I connect to the server.
 - I send messages to the server by listening for key events like the arrow key events.
-- server recieves a message and passes it to the execute_message() method of the robot object I made to encapsulate the robot logic (moving servos, remembering commands,etc).
+- server recieves a message and passes it to the process_message() method of the robot object I made to encapsulate the robot logic (moving servos, remembering commands,etc).
 - For streaming the camera feed back to my browser, I have another server running on a different port that gets the camera data as a byte string, encodes that in a base64 string (cause you can construct html images out of a base64 string) and sends it the client. On the client side a javascript function takes that base64 string and keeps on updating the source of an image everytime it recieves data (which is every frame). I could also send the binary data directly over the websocket connection instead of encoding it, but then I would have to construct an image out the blob object I get in javascript which doesn't seem to have any benefits to this method.
-
+- The sonar sensor is placed on a servo that rotates around 180 degrees. I get the sonar data and the angle the servo is currently at and send that information to the frontend. I then render it on an html canvas object that is my "Radar chart". 
 
 #### Why WebSockets and not http or another protocol?
 I want a way to push data from the server without the client having to keep requesting it (the camera feed) and I also want to be sending messages really frequently (potentially every time someone presses a certain key). Sending http requests rapidly through javascript (using fetch API,for example, causes the interface to lag). Lastly, Python, which all of my backend code is in, has a pretty good library for using websockets and javascript also has a native API for dealing with them.
