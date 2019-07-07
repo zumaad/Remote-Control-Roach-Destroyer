@@ -24,6 +24,7 @@ async def main_message_handler(websocket, path):
     print("client connected to streaming server!")
     streaming_task = None
     camera = None
+
     while True:
         message = await websocket.recv()
         print(message)

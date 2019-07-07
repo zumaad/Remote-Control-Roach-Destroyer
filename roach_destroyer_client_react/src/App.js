@@ -94,10 +94,10 @@ class HistoryPanel extends React.Component {
     super(props);
     this.state = { 
       commandSets: 
-      {"set1":[],
-      "set2":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
-      "set3":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
-      "set4":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
+      {"set up":[],
+      "go to kitchen":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}],
+      "twirl":[{command:'ArrowRight',time:166613},{command:'ArrowLeft',time:66641}],
+      "square movement":[{command:'ArrowUp',time:123213},{command:'ArrowDown',time:751241}]},
       currentSet:null,
       lastTime:null,
       justCreated:null}
@@ -337,10 +337,16 @@ class CreateSetButton extends React.Component {
   }
 }
 
-//made this a react componenet so i could hook it into existing interface code more easily
-class SonicRadarDisplay extends React.Component {
-  constructor(props) {
-    super(props);
+function SonicRadarDisplay() {
+  return (
+    <div id = "sonarDisplayBox">
+      <canvas id = "sonarCanvas" width = '500' height = '500' ></canvas>
+    </div>)
+}
+
+class SonicRadar{
+  constructor() {
+    this.cleanState = null
     this.canvasHeight = 500
     this.canvasWidth = 500
     this.backgroundColor = '#272727'
@@ -349,19 +355,14 @@ class SonicRadarDisplay extends React.Component {
     this.centerY = this.canvasHeight/2
     this.green = '#00FF33'
     this.red = '#ff5874'
-    
-    this.initializeCanvasDisplay = this.initializeCanvasDisplay.bind(this);
-    this.initializeCanvasCircles = this.initializeCanvasCircles.bind(this);
-    this.initializeCanvasNavLines = this.initializeCanvasNavLines.bind(this);
-    this.initializeCanvasText = this.initializeCanvasText.bind(this);
-    this.drawRobotBox = this.drawRobotBox.bind(this);
   }
 
   initializeCanvasDisplay() {
     this.initializeCanvasCircles()
     this.initializeCanvasNavLines()
     this.drawRobotBox()
-    this.initializeCanvasText()    
+    this.initializeCanvasText()  
+    this.setCleanState()  
     
   }
 
@@ -426,31 +427,56 @@ class SonicRadarDisplay extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.initializeCanvasDisplay()
+  setCleanState() {
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+    this.cleanState = canvasContext.getImageData(0,0,canvas.width,canvas.height);
   }
 
-  render() {
-    return (
-    <div id = "sonarDisplayBox">
-      <canvas id = "sonarCanvas" width = '500' height = '500' ></canvas>
-    </div>)
+  drawLine(angle,contactDistance){
+    /**
+     * the servo goes from 90 to -90 and the servo's -90, is actually 0 here as the
+     * servo has 0 degrees as its starting position when its pointing perpendicular
+     * to the x and y axis instead of the right x axis being 0 degrees.
+     *  */ 
+    let canvas = document.getElementById("sonarCanvas");
+    let canvasContext = canvas.getContext("2d");
+
+    let radians = (Math.PI/180.0) * -(angle + 90)
+    
+    let greenLineLength = (contactDistance/100 * this.radius)
+    
+    let yDistance = greenLineLength * Math.sin(radians)
+    let xDistance = greenLineLength * Math.cos(radians)
+    let greenlineCoordinates = [this.centerX + xDistance,this.centerY + yDistance]
+    canvasContext.strokeStyle = this.green
+    canvasContext.beginPath()
+    canvasContext.moveTo(this.centerX,this.centerY)
+    canvasContext.lineTo(this.centerX + xDistance,this.centerY + yDistance)
+    canvasContext.stroke()
+    
+    canvasContext.strokeStyle = this.red
+    canvasContext.beginPath()
+    canvasContext.moveTo(greenlineCoordinates[0],greenlineCoordinates[1])
+    let redLineLength = this.radius - greenLineLength
+    yDistance = redLineLength * Math.sin(radians)
+    xDistance = redLineLength * Math.cos(radians)
+    canvasContext.lineTo(greenlineCoordinates[0] + xDistance,greenlineCoordinates[1] + yDistance)
+    canvasContext.stroke()
+
+    //revert the radar to a state where no lines are drawn when one sweep is compelete
+    if (angle === 90 || angle === -80) {
+      canvasContext.putImageData(this.cleanState,0,0)
+    }
   }
-  
 }
 
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.canvasHeight = 500
-    this.canvasWidth = 500
-    this.backgroundColor = '#272727'
-    this.radius = 240
-    this.centerX = this.canvasWidth/2
-    this.centerY = this.canvasHeight/2
-    this.green = '#00FF33'
-    this.red = '#ff5874'
+    this.sonicRadar = new SonicRadar()
+
     this.state = {
       streamingServer: null,
       commandServer: null,
@@ -475,15 +501,12 @@ class App extends React.Component {
     this.handleCommandServerMessages = this.handleCommandServerMessages.bind(this);
     this.handleStreamMessages = this.handleStreamMessages.bind(this)
     this.drawLine = this.drawLine.bind(this);
-    this.endStream = this.endStream.bind(this);
-    
+    this.endStream = this.endStream.bind(this);  
   }
 
   componentDidMount() {
-    let canvas = document.getElementById("sonarCanvas");
-    let canvasContext = canvas.getContext("2d");
-    let cleanState = canvasContext.getImageData(0,0,canvas.width,canvas.height);
-    this.setState({cleanSonar:cleanState})
+    this.sonicRadar.initializeCanvasDisplay()
+    
   }
 
   createConnection() {
@@ -499,7 +522,7 @@ class App extends React.Component {
 
   handleCommandServerMessages(data) {
     let decodedData = JSON.parse(data)
-    this.drawLine(decodedData[0],decodedData[1])
+    this.sonicRadar.drawLine(decodedData[0],decodedData[1])
     
   }
 
@@ -555,40 +578,6 @@ class App extends React.Component {
     this.setState({streamStatus:false})
   }
 
-  drawLine(angle,contactDistance){
-    /**
-     * the servo goes from 90 to -90 and the servo's -90, is actually 0 here as the
-     * servo has 0 degrees as its starting position when its pointing perpendicular
-     * to the x and y axis instead of the right x axis being 0 degrees.
-     *  */ 
-    console.log("draw line")
-    let distanceRatio = (contactDistance/100 * this.radius)
-    let radians = (Math.PI/180.0) * -(angle + 90)
-    let canvas = document.getElementById("sonarCanvas");
-    let canvasContext = canvas.getContext("2d");
-    if (angle === 90 || angle === -80) {
-      canvasContext.putImageData(this.state.cleanSonar,0,0)
-    }
-    
-    let yDistance = distanceRatio * Math.sin(radians)
-    let xDistance = distanceRatio * Math.cos(radians)
-    let greenlineCoordinates = [this.centerX + xDistance,this.centerY + yDistance]
-    canvasContext.strokeStyle = this.green
-    canvasContext.beginPath()
-    canvasContext.moveTo(this.centerX,this.centerY)
-    canvasContext.lineTo(this.centerX + xDistance,this.centerY + yDistance)
-    canvasContext.stroke()
-    
-    canvasContext.strokeStyle = this.red
-    canvasContext.beginPath()
-    canvasContext.moveTo(greenlineCoordinates[0],greenlineCoordinates[1])
-    let leftOverRadius = this.radius - distanceRatio
-    yDistance = leftOverRadius * Math.sin(radians)
-    xDistance = leftOverRadius * Math.cos(radians)
-    canvasContext.lineTo(greenlineCoordinates[0] + xDistance,greenlineCoordinates[1] + yDistance)
-    canvasContext.stroke()
-
-  }
 
   render() {
     return (
