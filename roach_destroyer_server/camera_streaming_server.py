@@ -20,9 +20,6 @@ async def start_streaming(websocket):
         await asyncio.sleep(.05)
 
     
-
-
-
  
 async def main_message_handler(websocket, path):
     print("client connected to streaming server!")

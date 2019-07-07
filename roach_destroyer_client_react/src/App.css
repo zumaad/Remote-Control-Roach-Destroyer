@@ -84,6 +84,7 @@ body {
   flex-grow: 1;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 #streamBox {
@@ -205,4 +206,10 @@ body {
 
 #sonarDisplayBox {
   text-align: center;
+}
+
+#stopStreamButton {
+  position: absolute;
+  top:10px;
+  right:10px
 }

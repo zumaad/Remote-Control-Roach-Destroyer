@@ -66,11 +66,19 @@ class StreamPanel extends React.Component {
     this.setState({ buttonPressed: true }, this.props.startStream)
   }
 
+  endStreamHandler() {
+    this.props.endStream()
+    this.setState({buttonPressed:true})
+  }
+
   render() {
     let button = this.state.buttonPressed ? null : <button id="startStream" className="btn nightowlButtons" onClick={this.prepareStreamBox}> Start Stream!</button>
-    let streamImage = this.state.buttonPressed ? <img id='stream' style={{ padding: '10px' }} /> : ""
+    let streamImage = this.state.buttonPressed ? <img id='stream' style={{ padding: '10px' }} /> : null;
+    let stopStreamButton = this.state.buttonPressed? <button id = "stopStreamButton" className = 'nightowlErrorButton' onClick = {this.endStreamHandler}> X </button> : null
+
     return (
       <div id="streamContainer">
+        {stopStreamButton}
         <div id="streamBox">
           {button}
           {streamImage}
@@ -535,6 +543,10 @@ class App extends React.Component {
     this.state.streamingServer.send("start stream")
   }
 
+  endStream() {
+    this.state.streamingServer.send("end stream")
+  }
+
   drawLine(angle,contactDistance){
     /**
      * the servo goes from 90 to -90 and the servo's -90, is actually 0 here as the
@@ -586,7 +598,8 @@ class App extends React.Component {
             arrowDown={this.state.arrows['ArrowDown']}
             arrowLeft={this.state.arrows['ArrowLeft']}
             arrowRight={this.state.arrows['ArrowRight']} />
-          <StreamPanel startStream={this.startStream} />
+          <StreamPanel startStream={this.startStream}
+                       endStream = {this.endStream} />
         </div>
         <SonicRadarDisplay></SonicRadarDisplay>
         <HistoryPanel  recivedCommandSets = {this.state.recivedCommandSets} commandServerSocket = {this.state.commandServer} commandAndTime = {this.state.commandAndTime} />
