@@ -11,7 +11,6 @@ async def main_message_handler(websocket, path):
     print("client connected!")
     roach_destroyer = robot.Robot(websocket = websocket)
     print("roach destroyer initialized!")
-    potential_task = None
     while True:
         message = await websocket.recv()
         deserialized_message = json.loads(message)
