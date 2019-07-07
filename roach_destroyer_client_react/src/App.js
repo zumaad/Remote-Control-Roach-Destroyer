@@ -337,11 +337,30 @@ class CreateSetButton extends React.Component {
   }
 }
 
-function SonicRadarDisplay() {
-  return (
-    <div id = "sonarDisplayBox">
-      <canvas id = "sonarCanvas" width = '500' height = '500' ></canvas>
-    </div>)
+class SonicRadarDisplay extends React.Component {
+  constructor(props){
+    super(props)
+    this.state = {buttonPressed:false}
+
+    this.sonarButtonHandler = this.sonarButtonHandler.bind(this);
+  }
+
+  sonarButtonHandler() {
+    let message = this.state.buttonPressed? "start":"stop"
+    this.props.startStopSonar(message)
+    this.setState((prevState) => ({buttonPressed:!prevState.buttonPressed}))
+  }
+
+  render() {
+    let button = this.state.buttonPressed? <button onClick = {this.sonarButtonHandler} id = 'sonarControlButton' className = ' btn2 nightowlErrorButton'> Stop </button>:
+    <button id = 'sonarControlButton' onClick = {this.sonarButtonHandler} className = 'btn2 nightowlButtons'> Start </button>
+    return (
+      <div id = "sonarDisplayBox">
+        <canvas id = "sonarCanvas" width = '500' height = '500' ></canvas>
+        {button}
+      </div>)
+  }
+  
 }
 
 class SonicRadar{
@@ -501,6 +520,7 @@ class App extends React.Component {
     this.handleCommandServerMessages = this.handleCommandServerMessages.bind(this);
     this.handleStreamMessages = this.handleStreamMessages.bind(this)
     this.endStream = this.endStream.bind(this);  
+    this.startStopSonar = this.startStopSonar.bind(this);
   }
 
   componentDidMount() {
@@ -566,6 +586,10 @@ class App extends React.Component {
     
   }
 
+  startStopSonar(message) {
+    this.state.commandServer.send(message)
+  }
+
 
   startStream() {
     this.state.streamingServer.send("start stream")
@@ -597,7 +621,7 @@ class App extends React.Component {
           <StreamPanel startStream={this.startStream}
                        endStream={this.endStream} />
         </div>
-        <SonicRadarDisplay></SonicRadarDisplay>
+        <SonicRadarDisplay startStopSonar = {this.startStopSonar} ></SonicRadarDisplay>
         <HistoryPanel  recivedCommandSets = {this.state.recivedCommandSets} commandServerSocket = {this.state.commandServer} commandAndTime = {this.state.commandAndTime} />
         
       </div>

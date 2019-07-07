@@ -20,21 +20,32 @@ class Robot:
         self.init_at = datetime.datetime.now().time()
         self.left_servo = Servo(PWM_PIN1,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.right_servo = Servo(servo_pin2,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
-        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.return_reverse_task,'upload':self.save_command_sets}
+        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.return_reverse_task,'upload':self.save_command_sets,'sonar':self.handle_sonar}
         self.movement_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards,'stop':self.stop}
         self.command_database_url = ""
         self.database_path = ""
         self.websocket = websocket
         self.sonic_sensor = DistanceSensor(echo = 17,trigger = 4)
         self.angular_servo = AngularServo(21,max_pulse_width = 2/1000,min_pulse_width = 1/10000)
-        self.couroutines_on_init = [self.transmit_sonar_data]
-        self.run_scheduled_coroutines()
+        # self.couroutines_on_init = [self.transmit_sonar_data]
+        # self.run_scheduled_coroutines()
+        self.current_running_task = None
         
 
-    def run_scheduled_coroutines(self):
-        for coro in self.couroutines_on_init:
-            asyncio.ensure_future(coro())
-            
+    # def run_scheduled_coroutines(self):
+    #     for coro in self.couroutines_on_init:
+    #         asyncio.ensure_future(coro())
+
+    def handle_sonar(self,message):
+        if message == 'start':
+            sonar_task = asyncio.ensure_future(self.transmit_sonar_data())
+            self.current_running_task = sonar_task
+        elif message == 'stop':
+            self.current_running_task.cancel()
+
+    def return_transmit_sonar_task(self):
+        task = asyncio.ensure_future(self.transmit_sonar_data()) 
+        self.current_running_task = task  
 
     async def transmit_sonar_data(self):
         self.angular_servo.min()
