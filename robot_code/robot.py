@@ -99,7 +99,7 @@ class Robot:
             self.stop()
     
     def execute_movement(self,direction):
-        if 'movement' in self.current_background_tasks and self.current_background_tasks['movements']:
+        if 'movement' in self.current_background_tasks and self.current_background_tasks.get('movement',None):
             self.current_background_tasks['movement'].cancel()
             self.current_background_tasks['movement'] = None
         correct_method = self.movement_commands[direction]
