@@ -462,7 +462,8 @@ class App extends React.Component {
       arrows: { 'ArrowUp': 'unlitArrowUp', 'ArrowDown': 'unlitArrowDown', 'ArrowRight': 'unlitArrowRight', 'ArrowLeft': 'unlitArrowLeft' },
       commandAndTime:[],
       recivedCommandSets:null,
-      cleanSonar:null
+      cleanSonar:null,
+      streamStatus:false
     }
     
 
@@ -537,16 +538,21 @@ class App extends React.Component {
   }
 
   handleStreamMessages(data) {
-    document.getElementById('stream').src = "data:image/jpeg;base64," + data
+    if (this.state.streamStatus) {
+      document.getElementById('stream').src = "data:image/jpeg;base64," + data
+    }
+    
   }
 
 
   startStream() {
     this.state.streamingServer.send("start stream")
+    this.setState({streamStatus:true})
   }
 
   endStream() {
     this.state.streamingServer.send("end stream")
+    this.setState({streamStatus:false})
   }
 
   drawLine(angle,contactDistance){

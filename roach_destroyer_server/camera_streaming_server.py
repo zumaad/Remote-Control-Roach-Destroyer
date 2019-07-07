@@ -7,15 +7,13 @@ import base64
 
 
 
-async def start_streaming(websocket):
-    camera = PiCamera()
+async def start_streaming(websocket,camera):
     camera.resolution = (700, 400)
     time.sleep(2)
     while True:
         my_stream = BytesIO()
         camera.capture(my_stream,quality=20,format ='jpeg',use_video_port=True)
         bytes_from_frame = my_stream.getvalue()
-        print(len(bytes_from_frame))
         base64str = base64.encodestring(bytes_from_frame).decode()
         await websocket.send(base64str)
         await asyncio.sleep(.05)
@@ -25,13 +23,15 @@ async def start_streaming(websocket):
 async def main_message_handler(websocket, path):
     print("client connected to streaming server!")
     streaming_task = None
+    camera = None
     while True:
         message = await websocket.recv()
         print(message)
-
         if message == 'start stream':
             print("starting stream!")
-            streaming_task = asyncio.ensure_future(start_streaming(websocket))
+            if not camera:
+                camera = PiCamera()
+            streaming_task = asyncio.ensure_future(start_streaming(websocket,camera))
         elif message == 'end stream':
             print("ending stream")
             if streaming_task:
