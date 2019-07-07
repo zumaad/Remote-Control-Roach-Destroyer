@@ -500,7 +500,6 @@ class App extends React.Component {
     this.startStream = this.startStream.bind(this);
     this.handleCommandServerMessages = this.handleCommandServerMessages.bind(this);
     this.handleStreamMessages = this.handleStreamMessages.bind(this)
-    this.drawLine = this.drawLine.bind(this);
     this.endStream = this.endStream.bind(this);  
   }
 
