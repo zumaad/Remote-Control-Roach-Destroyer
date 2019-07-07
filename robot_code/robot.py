@@ -20,7 +20,7 @@ class Robot:
         self.init_at = datetime.datetime.now().time()
         self.left_servo = Servo(PWM_PIN1,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
         self.right_servo = Servo(servo_pin2,frame_width =20/1000,max_pulse_width = max_pulse,min_pulse_width = min_pulse)
-        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.return_playback_task,'reverse':self.handle_reverse_task,'upload':self.save_command_sets,'sonar':self.handle_sonar}
+        self.command_type_to_method = {'movement':self.execute_movement,'playback':self.handle_playback_task,'reverse':self.handle_reverse_task,'upload':self.save_command_sets,'sonar':self.handle_sonar}
         self.movement_commands = {'ArrowUp':self.move_forward,'ArrowRight':self.turn_right,'ArrowLeft':self.turn_left,'ArrowDown':self.move_backwards,'stop':self.stop}
         self.command_database_url = ""
         self.database_path = ""
@@ -81,21 +81,20 @@ class Robot:
         for direction,duration in direction_duration_tups:
             direction = reversed_directions[direction]
             print("Executing {} for {} ms".format(direction,duration))
-            correct_method = self.movement_commands[direction]
-            correct_method()
+            self.movement_commands[direction]()
             await asyncio.sleep(duration/1000)
             self.stop()
 
+    def handle_playback_task(self,command_set):
+        playback_task = asyncio.ensure_future(self.execute_playback(command_set))
+        self.current_background_tasks['movement'] = playback_task
 
-    def return_playback_task(self,command_set):
-        task = asyncio.ensure_future(self.execute_playback(command_set))
-        return task
     
     async def execute_playback(self,command_set):
         direction_duration_tups = RobotUtils.process_command_set(command_set)  #[('ArrowRight',3411),('ArrowDown',5000)]
         for direction,duration in direction_duration_tups:
             print("Executing {} for {} ms".format(direction,duration))
-            self.execute_movement(direction)
+            self.movement_commands[direction]()
             await asyncio.sleep(duration/1000)
             self.stop()
     

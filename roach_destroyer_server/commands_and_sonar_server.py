@@ -14,12 +14,9 @@ async def main_message_handler(websocket, path):
     potential_task = None
     while True:
         message = await websocket.recv()
-        if potential_task:
-            potential_task.cancel()
-            potential_task = None
         deserialized_message = json.loads(message)
         print(deserialized_message)
-        potential_task = roach_destroyer.process_message(deserialized_message)
+        roach_destroyer.process_message(deserialized_message)
         
 
 start_server = websockets.serve(main_message_handler, '0.0.0.0', 8765)
