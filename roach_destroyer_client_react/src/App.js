@@ -60,6 +60,7 @@ class StreamPanel extends React.Component {
       buttonPressed: false
     }
     this.prepareStreamBox = this.prepareStreamBox.bind(this);
+    this.endStreamHandler = this.endStreamHandler.bind(this);
   }
 
   prepareStreamBox() {
@@ -68,7 +69,7 @@ class StreamPanel extends React.Component {
 
   endStreamHandler() {
     this.props.endStream()
-    this.setState({buttonPressed:true})
+    this.setState({buttonPressed:false})
   }
 
   render() {
@@ -473,6 +474,7 @@ class App extends React.Component {
     this.handleCommandServerMessages = this.handleCommandServerMessages.bind(this);
     this.handleStreamMessages = this.handleStreamMessages.bind(this)
     this.drawLine = this.drawLine.bind(this);
+    this.endStream = this.endStream.bind(this);
     
   }
 
@@ -599,7 +601,7 @@ class App extends React.Component {
             arrowLeft={this.state.arrows['ArrowLeft']}
             arrowRight={this.state.arrows['ArrowRight']} />
           <StreamPanel startStream={this.startStream}
-                       endStream = {this.endStream} />
+                       endStream={this.endStream} />
         </div>
         <SonicRadarDisplay></SonicRadarDisplay>
         <HistoryPanel  recivedCommandSets = {this.state.recivedCommandSets} commandServerSocket = {this.state.commandServer} commandAndTime = {this.state.commandAndTime} />
