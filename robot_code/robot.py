@@ -81,7 +81,8 @@ class Robot:
         for direction,duration in direction_duration_tups:
             direction = reversed_directions[direction]
             print("Executing {} for {} ms".format(direction,duration))
-            self.execute_movement(direction)
+            correct_method = self.movement_commands[direction]
+            correct_method()
             await asyncio.sleep(duration/1000)
             self.stop()
 
