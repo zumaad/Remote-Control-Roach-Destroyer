@@ -8,7 +8,7 @@
 I
 - can control the robot remotely(make it move in all directions,turn on camera,sonar, etc)
 - can stream back its surroundings with the camera and see it on the frontend
-- can stream back sonar data that get from my sonar sensor and then use it to create a radar chart that allows me to see the distances of objects around my robot
+- can stream back sonar data that I get from the sonar sensor and then use it to create a radar chart that allows me to see the distances of objects around my robot
 - can store sets of commands on the front end and then play them again,play them in reverse, or upload them to the robot to be accessed later.
 - can control when the background tasks like the sonar sensor/servo,playbacks,or camera turn on and off.
 
