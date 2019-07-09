@@ -2,6 +2,22 @@
 
 ### A remote control robot controlled with a raspberrypi.
 
+## TENTATIVE DEMOS (going to record them again, but horizontally this time....and with better quality)
+
+1. This video demos sonar obstacle detection, camera streaming, and movement
+https://youtu.be/vQvloFHlsto
+
+2. This video showcases just the sonar capabilites 
+https://youtu.be/plLTiLzj7nk
+
+3. This video showcases just the camera streaming
+https://youtu.be/7o7IftcbYTc
+
+4. This video demos the ability to reverse previously issued commands to move the robot back to where it started from automatically
+https://youtu.be/U3DQXjrbG60
+
+
+
 
 
 ### Current progress
@@ -11,18 +27,6 @@ I
 - can stream back sonar data that I get from the sonar sensor and then use it to create a radar chart that allows me to see the distances of objects around my robot
 - can store sets of commands on the front end and then play them again,play them in reverse, or upload them to the robot to be accessed later.
 - can control when the background tasks like the sonar sensor/servo,playbacks,or camera turn on and off.
-
-The video below is old. I'm going to update this with a newer video soon.
-
-https://youtu.be/YflDiKFGsfs 
-
-
-
-#### Client interface vid
-Client vid is old too, gonna upload a vid of the newer interface soon.
-
-https://www.youtube.com/watch?v=50GbFLyWaOw
-
 
 
 ### Overview: 
