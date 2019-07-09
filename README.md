@@ -5,8 +5,8 @@
 ## TENTATIVE DEMOS (going to record them again, but horizontally this time....and with better quality)
 
 1. This video demos sonar obstacle detection, camera streaming, and movement
-https://youtu.be/vQvloFHlsto
- :14 for the camera streaming :50 for the sonar
+https://youtu.be/vQvloFHlsto  
+:14 for the camera streaming :50 for the sonar
 
 2. This video showcases just the sonar capabilites 
 https://youtu.be/plLTiLzj7nk
